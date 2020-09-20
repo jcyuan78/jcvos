@@ -12,16 +12,19 @@ namespace jcvos
 	public:
 		// 获取从offset开始，len长度的指针。locked返回实际lock的长度，可能小于len
 		// 都已sector为单位。
-		//virtual BYTE * PartialLock(JCSIZE start, JCSIZE secs, JCSIZE & locked) = 0;
+		//virtual BYTE * PartialLock(size_t start, size_t secs, size_t & locked) = 0;
 		virtual BYTE * Lock(void) = 0;
 		virtual void Unlock(void * ptr) = 0;
 		// return size in byte
 		virtual size_t GetSize(void) const = 0;
+		//virtual void CopyTo(IBinaryBuffer * & buf) = 0;
 	};
 
 
 	// factory
 	bool CreateBinaryBuffer(jcvos::IBinaryBuffer * & buf, size_t len, size_t reserved=0);
+	// 从src复制data到dst，和原来data不共享内存。
+	bool DuplicateBuffer(jcvos::IBinaryBuffer * & dst, jcvos::IBinaryBuffer * src);
 	bool CreateAlignBuffer(jcvos::IBinaryBuffer * & buf, 
 		size_t len);	// [in] buffer length in byte
 	bool CreatePartialBuffer(jcvos::IBinaryBuffer * & partial, // [out] of buf object

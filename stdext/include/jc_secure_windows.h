@@ -10,7 +10,7 @@ namespace jcvos
 		return _vtprintf_s(format, argptr);
 	}
 
-	inline int jc_vsprintf(TCHAR * buf, JCSIZE buf_size, LPCTSTR format, va_list argptr)
+	inline int jc_vsprintf(TCHAR * buf, size_t buf_size, LPCTSTR format, va_list argptr)
 	{
 		return _vstprintf_s(buf, buf_size, format, argptr);
 	};
@@ -27,18 +27,18 @@ namespace jcvos
 		return _tfopen_s(pfile, filename, mode);
 	};
 
-	inline TCHAR * jc_strcat(TCHAR * dst, JCSIZE buf_size, LPCTSTR src)
+	inline TCHAR * jc_strcat(TCHAR * dst, size_t buf_size, LPCTSTR src)
 	{
 		_tcscat_s(dst, buf_size, src);
 		return dst;
 	}
 
-	inline JCSIZE jc_strftime(TCHAR * dst, JCSIZE buf_size, LPCTSTR format, const struct tm * timeptr)
+	inline size_t jc_strftime(TCHAR * dst, size_t buf_size, LPCTSTR format, const struct tm * timeptr)
 	{
-		return (JCSIZE)(_tcsftime(dst, buf_size, format, timeptr));
+		return (size_t)(_tcsftime(dst, buf_size, format, timeptr));
 	}
 
-	inline jcerrno jc_memcpy(void *dst, JCSIZE buf_size, const void * src, JCSIZE count)
+	inline jcerrno jc_memcpy(void *dst, size_t buf_size, const void * src, size_t count)
 	{
 		return memcpy_s(dst, buf_size, src, count);
 	}
@@ -51,11 +51,11 @@ namespace jcvos
 	inline int jc_str2ul(LPCTSTR str, LPTSTR * str_end, int base)		{	return _tcstoul(str, str_end, base);}
 
 
-	inline jcerrno jc_int2str(INT64 val, LPTSTR str, JCSIZE buf_size, int base)
+	inline jcerrno jc_int2str(INT64 val, LPTSTR str, size_t buf_size, int base)
 	{
 		return _i64tot_s(val, str, buf_size, base);
 	}
-	inline jcerrno jc_uint2str(UINT64 val, LPTSTR str, JCSIZE buf_size, int base)
+	inline jcerrno jc_uint2str(UINT64 val, LPTSTR str, size_t buf_size, int base)
 	{
 		return _ui64tot_s(val, str, buf_size, base);
 	}

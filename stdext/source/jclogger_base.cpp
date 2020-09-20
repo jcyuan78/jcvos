@@ -15,7 +15,7 @@
 const GUID CJCLoggerLocal::m_guid = 
 { 0x6106ece5, 0xcfb9, 0x4440, { 0xa3, 0x69, 0x5d, 0xf8, 0x55, 0x22, 0xc0, 0x70 } };
 
-static const double ts_cycle = CJCLogger::Instance()->GetTimeStampCycle();
+extern const double ts_cycle = CJCLogger::Instance()->GetTimeStampCycle();
 
 CJCLoggerLocal::CJCLoggerLocal(CJCLoggerAppender * appender)
     : m_appender(appender)
@@ -55,27 +55,29 @@ CJCLoggerLocal::~CJCLoggerLocal(void)
 #endif
 }
 
-CJCLoggerNode * CJCLoggerLocal::EnableCategory(const CJCStringW & name, int level)
+CJCLoggerNode * CJCLoggerLocal::EnableCategory(const std::wstring & name, int level)
 {
     LoggerCategoryMap::iterator it = m_logger_category.find(name);
     if (it == m_logger_category.end() )
     {
         // Create new logger
         CJCLoggerNode * logger = CJCLoggerNode::CreateLoggerNode(name, level);
-		_LOG_(_T("add logger: 0x%08X, %s, this=0x%08X\n"), (UINT32)(logger), name.c_str(), (UINT32)this )
+//		_LOG_(_T("add logger: 0x%08X, %s, this=0x%08X\n"), (UINT32)(logger), name.c_str(), (UINT32)this )
+		_LOG_(L"add logger: 0x%p, %s, this=0x%p\n", logger, name.c_str(), this )
         std::pair<LoggerCategoryMap::iterator, bool> rc;
         rc = m_logger_category.insert(LoggerCategoryMap::value_type(name, logger) );
         it = rc.first;
     }
 	else
 	{
-		_LOG_(_T("enable logger: 0x%08X, %s, this=0x%08X\n"), 
-			(UINT32)(it->second), name.c_str(), (UINT32)this )
+		//_LOG_(_T("enable logger: 0x%08X, %s, this=0x%08X\n"), 
+		//	(UINT32)(it->second), name.c_str(), (UINT32)this )
+		_LOG_(L"enable logger: 0x%p, %s, this=0x%p\n", it->second, name.c_str(), this )
 	}
     return it->second;
 }
 
-CJCLoggerNode * CJCLoggerLocal::GetLogger(const CJCStringW & name/*, int level*/)
+CJCLoggerNode * CJCLoggerLocal::GetLogger(const std::wstring & name/*, int level*/)
 {
     CJCLoggerNode * logger = NULL;
     LoggerCategoryMap::iterator it = m_logger_category.find(name);
@@ -147,8 +149,8 @@ void CJCLoggerLocal::ParseAppender(LPTSTR line_buf, const std::wstring & app_pat
 	if (temp)
 	{
 		TCHAR msg[256];
-		//JCSIZE len = _stprintf_s(msg, _T("[APPENDER] change to %s : %s\n"), app_type, file_name?file_name:_T(""));
-		JCSIZE len = _stprintf_s(msg, _T("[APPENDER] change to %s\n"), app_type);
+		//size_t len = _stprintf_s(msg, _T("[APPENDER] change to %s : %s\n"), app_type, file_name?file_name:_T(""));
+		size_t len = _stprintf_s(msg, _T("[APPENDER] change to %s\n"), app_type);
 		m_appender->WriteString(msg, len );
 		delete m_appender;
 		m_appender = temp;
@@ -191,7 +193,7 @@ void CJCLoggerLocal::ParseNode(LPTSTR line_buf)
 bool CJCLoggerLocal::Configurate(FILE * config, const std::wstring & app_path)
 {
 	JCASSERT(config);
-	static const JCSIZE MAX_LINE_BUF=128;
+	static const size_t MAX_LINE_BUF=128;
 	wchar_t * line_buf = new wchar_t[MAX_LINE_BUF];
 
 	while (1)
@@ -245,7 +247,7 @@ bool CJCLoggerLocal::Configurate(LPCTSTR file_name, LPCTSTR app_path)
 
 bool CJCLoggerLocal::RegisterLoggerNode(CJCLoggerNode * node)
 {
-    const CJCStringW &node_name = node->GetNodeName();
+    const std::wstring &node_name = node->GetNodeName();
     bool rc = true;
     LoggerCategoryMap::iterator it = m_logger_category.find(node_name);
     if ( it != m_logger_category.end() )
@@ -265,7 +267,7 @@ bool CJCLoggerLocal::UnregisterLoggerNode(CJCLoggerNode * node)
     return m_logger_category.erase(node->GetNodeName()) > 0;
 }
 
-void CJCLoggerLocal::WriteString(LPCTSTR str, JCSIZE len)
+void CJCLoggerLocal::WriteString(LPCTSTR str, size_t len)
 {
 	EnterCriticalSection(&m_critical);
 	JCASSERT(m_appender);
@@ -298,7 +300,7 @@ void CJCLoggerLocal::CreateAppender(LPCTSTR app_type, LPCTSTR file_name, DWORD p
 	if (temp)
 	{
 		TCHAR msg[256];
-		JCSIZE len = _stprintf_s(msg, _T("[APPENDER] change to %s : %s\n"), app_type, file_name?file_name:_T(""));
+		size_t len = _stprintf_s(msg, _T("[APPENDER] change to %s : %s\n"), app_type, file_name?file_name:_T(""));
 		m_appender->WriteString(msg, len );
 		delete m_appender;
 		m_appender = temp;
@@ -345,7 +347,7 @@ void CJCLoggerLocal::OutputFunctionDuration(void)
 
 //double CJCLoggerNode::m_ts_cycle = CJCLogger::Instance()->GetTimeStampCycle();
 
-CJCLoggerNode::CJCLoggerNode(const CJCStringW & name, int level, CJCLogger * logger)
+CJCLoggerNode::CJCLoggerNode(const std::wstring & name, int level, CJCLogger * logger)
     : m_category(name)
     , m_level(level)
     , m_logger(logger)
@@ -406,7 +408,7 @@ void CJCLoggerNode::LogMessageFuncV(LPCSTR function, LPCTSTR format, va_list arg
 
 		if (col_sel & CJCLoggerLocal::COL_REAL_DATE)
 		{
-			JCSIZE ll = jcvos::jc_strftime(strtime, 32, _T("%Y.%m.%d"), &now_t);
+			size_t ll = jcvos::jc_strftime(strtime, 32, _T("%Y.%m.%d"), &now_t);
 			strtime[ll] = 0;
 			ir = jcvos::jc_sprintf(str, remain, _T("<%ls> "), strtime);
 			if (ir >=0 )  str+=ir, remain-=ir;
@@ -414,7 +416,7 @@ void CJCLoggerNode::LogMessageFuncV(LPCSTR function, LPCTSTR format, va_list arg
 
 		if (col_sel & CJCLoggerLocal::COL_REAL_TIME)
 		{
-			JCSIZE ll = jcvos::jc_strftime(strtime, 32, _T("%H:%M:%S"), &now_t);
+			size_t ll = jcvos::jc_strftime(strtime, 32, _T("%H:%M:%S"), &now_t);
 			strtime[ll] = 0;
 			ir = jcvos::jc_sprintf(str, remain, _T("<%ls> "), strtime);
 			if (ir >=0 )  str+=ir, remain-=ir;
@@ -442,7 +444,7 @@ void CJCLoggerNode::LogMessageFuncV(LPCSTR function, LPCTSTR format, va_list arg
 	if (ir >= 0 )  str+=ir, remain-=ir;
 	str[0] = _T('\n'), str[1] = 0;
 	str++, remain--;
-	JCSIZE len = str - str_msg;
+	size_t len = str - str_msg;
     m_logger->WriteString(str_msg, len);
 }
 
@@ -450,7 +452,7 @@ void CJCLoggerNode::LogMessageFuncV(LPCSTR function, LPCTSTR format, va_list arg
 ///////////////////////////////////////////////////////////////////////////////
 //-- JCStaticLoggerNode
 JCStaticLoggerNode::JCStaticLoggerNode(
-        const CJCStringW & name, int level)
+        const std::wstring & name, int level)
     : CJCLoggerNode(name, level)
 {
     CJCLogger * logger = CJCLogger::Instance();
@@ -496,8 +498,14 @@ CJCStackTrace::~CJCStackTrace(void)
 	{
 		m_log->LogMessageFunc(m_func_name.c_str(), _T("[TRACE OUT], duration = %.1f us"), runtime);
 	}
-
 }
+
+double CJCStackTrace::GetRuntime(void) {
+	LARGE_INTEGER now;
+	QueryPerformanceCounter(&now);
+	return (now.QuadPart - m_start_time)* ts_cycle;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // -- StackPerformance
@@ -533,3 +541,9 @@ double CJCStackPerformance::GetDeltaTime(void)
 	return ( delta * ts_cycle);
 }
 
+//double	jcvos::GetTimeStampUs(void)
+//{	// 返回以us为单位的time stamp
+//	LARGE_INTEGER t0;		// 性能计算
+//	QueryPerformanceCounter(&t0);
+//	return (t0.QuadPart) * ts_cycle;
+//}

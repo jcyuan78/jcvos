@@ -78,7 +78,7 @@ namespace jcvos
 			THROW_ERROR(ERR_APP, _T("Table do not support add sub value"));
 		}
 
-		virtual JCSIZE GetRowID(void) const {return m_id; }
+		virtual size_t GetRowID(void) const {return m_id; }
 		virtual int GetColumnSize() const {return m_column_info.GetSize();}
 
 		// 从一个通用的行中取得通用的列数据
@@ -131,11 +131,11 @@ namespace jcvos
 		virtual void ToStream(IJCStream * stream, jcvos::VAL_FORMAT fmt, DWORD) const
 		{
 			JCASSERT(stream);
-			JCSIZE col_size = GetColumnSize();
+			size_t col_size = GetColumnSize();
 			const ROW_BASE_TYPE * row = static_cast<const ROW_BASE_TYPE*>(this);
 			CJCStringT str;
 
-			for (JCSIZE ii = 0; ii < col_size; ++ii)
+			for (size_t ii = 0; ii < col_size; ++ii)
 			{
 				CJCStringT str;
 				const CFieldDefinition * col_info = GetColumnInfo(ii);
@@ -170,7 +170,7 @@ namespace jcvos
 		, public CJCInterfaceBase
 	{
 	public:
-		static void Create(JCSIZE reserved_size, CTypedTable<ROW_BASE_TYPE, ROW_TYPE> * & table)
+		static void Create(size_t reserved_size, CTypedTable<ROW_BASE_TYPE, ROW_TYPE> * & table)
 		{
 			JCASSERT(NULL == table);
 			table = new CTypedTable<ROW_BASE_TYPE, ROW_TYPE>(reserved_size);
@@ -181,7 +181,7 @@ namespace jcvos
 		typedef std::vector<ROW_BASE_TYPE>			ROW_TABLE;
 		typedef typename ROW_TABLE::iterator		ROW_ITERATOR;
 		
-		CTypedTable(JCSIZE reserved_size) : m_table() { m_table.reserve(reserved_size); }
+		CTypedTable(size_t reserved_size) : m_table() { m_table.reserve(reserved_size); }
 
 	public:
 		virtual void GetValueText(CJCStringT & str) const {};
@@ -203,18 +203,18 @@ namespace jcvos
 			THROW_ERROR(ERR_APP, _T("Table do not support add sub value"));
 		}
 
-		virtual JCSIZE GetRowSize() const
+		virtual size_t GetRowSize() const
 		{
 			return m_table.size();
 		}
 
-		virtual void GetRow(JCSIZE index, IValue * & ptr_row)
+		virtual void GetRow(size_t index, IValue * & ptr_row)
 		{
 			ROW_BASE_TYPE & row = m_table.at(index);
 			ptr_row = static_cast<IValue*>(new ROW_TYPE( row ));
 		}
 
-		virtual JCSIZE GetColumnSize() const
+		virtual size_t GetColumnSize() const
 		{
 			const CColumnInfoList * col_list = ROW_TYPE::GetColumnInfo();
 			JCASSERT(col_list);
@@ -226,8 +226,8 @@ namespace jcvos
 			// output head
 			const CColumnInfoList * col_list = ROW_TYPE::GetColumnInfo();
 			JCASSERT(col_list);
-			JCSIZE col_size = col_list->GetSize();
-			for (JCSIZE ii = 0; ii < col_size; ++ii)
+			size_t col_size = col_list->GetSize();
+			for (size_t ii = 0; ii < col_size; ++ii)
 			{
 				const CFieldDefinition * col_info = col_list->GetItem(ii);
 				JCASSERT(col_info);
@@ -240,7 +240,7 @@ namespace jcvos
 			ROW_TABLE::const_iterator endit = m_table.end();
 			for ( ; it!=endit; ++it)
 			{	// 写入行
-				for (JCSIZE ii = 0; ii < col_size; ++ii)
+				for (size_t ii = 0; ii < col_size; ++ii)
 				{
 					CJCStringT str;
 					const CFieldDefinition * col_info = col_list->GetItem(ii);
@@ -273,10 +273,11 @@ namespace jcvos
 		//类型验证
 	};
 
-	class CColumn : virtual public IVector, public CJCInterfaceBase
+	class CColumn : virtual public IVector/*, public CJCInterfaceBase*/
 	{
 	public:
-		CColumn(ITable * tab, const CFieldDefinition * col_info);
+		CColumn(void);
+		void Init(ITable * tab, const CFieldDefinition * col_info);
 		~CColumn(void);
 
 	public:
@@ -284,8 +285,8 @@ namespace jcvos
 		virtual void GetValueText(CJCStringT & str) const {/* DO NOT SUPPORT*/};
 		virtual void SetValueText(LPCTSTR str)  {/* DO NOT SUPPORT*/};
 		// IVector
-		virtual JCSIZE GetRowSize() const;
-		virtual void GetRow(JCSIZE index, IValue * & row);
+		virtual size_t GetRowSize() const;
+		virtual void GetRow(size_t index, IValue * & row);
 		virtual void PushBack(IValue * row) {/* DO NOT SUPPORT*/};
 
 		virtual void GetSubValue(LPCTSTR name, IValue * & val) {/* DO NOT SUPPORT*/};

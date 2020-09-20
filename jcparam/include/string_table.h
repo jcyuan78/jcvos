@@ -23,8 +23,8 @@ namespace jcvos
 	public:
 		NO_INDEX<P_ITEM_TYPE>(void) {};
 		void push_back(P_ITEM_TYPE) {};
-		void reserve(JCSIZE) {};
-		P_ITEM_TYPE & operator [] (JCSIZE) 
+		void reserve(size_t) {};
+		P_ITEM_TYPE & operator [] (size_t) 
 		{
 			THORW_ERROR(ERR_APP, _T("Do not support sub index.") );
 			P_ITEM_TYPE dummy = NULL;
@@ -113,10 +113,10 @@ namespace jcvos
 			m_sub_index->push_back(item);
 		}
 
-		const JCSIZE GetSize() const
+		const size_t GetSize() const
 		{
 			JCASSERT(m_item_map);
-			return (JCSIZE) m_item_map->size();
+			return (size_t) m_item_map->size();
 		}
 
 		const BASE_ITEM_TYPE * GetItem(const CJCStringT & key) const
@@ -128,7 +128,7 @@ namespace jcvos
 		};
 
 		// Sub Index
-		const BASE_ITEM_TYPE * GetItem(JCSIZE index) const
+		const BASE_ITEM_TYPE * GetItem(size_t index) const
 		{
 			JCASSERT(m_sub_index);
 			JCASSERT(index < m_sub_index->size());

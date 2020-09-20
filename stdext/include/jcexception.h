@@ -54,7 +54,7 @@ namespace jcvos
     protected:
         int             m_err_id;   // The heighest bit is autodelete
         CJCStringT      m_err_msg;
-		CJCStringA		m_msg_utf8;
+		std::string		m_msg_utf8;
     };
 
 // 应用程序参数行错误

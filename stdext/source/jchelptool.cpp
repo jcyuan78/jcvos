@@ -136,7 +136,8 @@ void jcvos::UnicodeToUtf8(std::string & dest, const std::wstring & src)
 	size_t dest_len = src_len * 3 + 1;
 
 	dest.resize(dest_len);
-	UnicodeToUtf8((char*)dest.data(), dest_len, szSrc, src_len);
+	size_t len = UnicodeToUtf8((char*)dest.data(), dest_len, szSrc, src_len);
+	dest.resize(len);
 }
 
 #define BYTE_1_REP          0x80    /* if <, will be represented in 1 byte */
@@ -148,7 +149,7 @@ void jcvos::UnicodeToUtf8(std::string & dest, const std::wstring & src)
 #define SURROGATE_MIN       0xd800
 #define SURROGATE_MAX       0xdfff
 
-int jcvos::UnicodeToUtf8(char *strDest, size_t nDestLen, const wchar_t *szSrc, size_t nSrcLen)
+size_t jcvos::UnicodeToUtf8(char *strDest, size_t nDestLen, const wchar_t *szSrc, size_t nSrcLen)
 {
     size_t i = 0;
     size_t i_cur_output = 0;
@@ -227,14 +228,15 @@ void jcvos::Utf8ToUnicode(std::wstring & dst, const std::string & src)
 
 	size_t dst_len = src_len;
 	dst.resize(dst_len);
-	Utf8ToUnicode((wchar_t*)(dst.data()), dst_len, sz_src, src_len);
+	size_t len = Utf8ToUnicode((wchar_t*)(dst.data()), dst_len, sz_src, src_len);
+	dst.resize(len);
 }
 
 
 size_t jcvos::Utf8ToUnicode(wchar_t *strDest, size_t nDestLen, const char *szSrc, size_t nSrcLen)
 {
 #ifdef WIN32
-	return MultiByteToWideChar(CP_UTF8, 0, szSrc, nSrcLen, strDest, nDestLen); 
+	return MultiByteToWideChar(CP_UTF8, 0, szSrc, (int)nSrcLen, strDest, (int)nDestLen); 
 #else
 	return 0;
 #endif

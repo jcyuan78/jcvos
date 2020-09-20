@@ -6,6 +6,8 @@
 #include "comm_linux.h"
 #elif defined WIN32
 #include "comm_windows.h"
+#elif defined WIN64
+#include "comm_windows.h"
 #else
 #error no platform defined
 #endif
@@ -17,7 +19,7 @@
 // 关于整数的定义
 
 // 对于32位系统，所有用于内存索引，下标的类型全部定义为32位
-typedef UINT	JCSIZE;
+//typedef UINT	JCSIZE;
 //JCSIZE operator = (size_t s)	{return (JCSIZE)s;};
 
 // 外部索引，全部使用64位
@@ -45,17 +47,17 @@ inline UINT64 MAKEQWORD(UINT a, UINT b)
 #define ROUND_UP_DIV(a, b)	((a+b-1)/b)
 
 // 关于字符串和UNICODE的定义
-typedef std::string			CJCStringA;
-typedef std::wstring		CJCStringW;
+//typedef std::string			CJCStringA;
+//typedef std::wstring		CJCStringW;
 
 
 #ifdef _UNICODE
 
-typedef CJCStringW	CJCStringT;
+typedef std::wstring	CJCStringT;
 
 #else
 //typedef char 
-typedef CJCStringA	CJCStringT;
+typedef std::string	CJCStringT;
 #endif
 
 
@@ -95,6 +97,7 @@ extern "C"
 #else
 
 #define JCASSERT(exp)
+//{	if (! (exp）) { THROW_ERROR(ERR_APP, L"[assertion] %s"); } }
 #define DO_NOTHING()
 
 #endif

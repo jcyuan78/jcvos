@@ -17,7 +17,7 @@ namespace jcvos
 	public:
 		virtual void SetSize(FILESIZE size) = 0;
 		virtual FILESIZE GetSize(void) const =0;
-		virtual LPVOID Mapping(FILESIZE offset, JCSIZE len) =0;
+		virtual LPVOID Mapping(FILESIZE offset, size_t len) =0;
 		virtual void Unmapping(LPVOID ptr) =0;
 		// 返回mapping的颗粒度
 		virtual UINT64 GetGranul(void) = 0;
@@ -41,7 +41,7 @@ namespace jcvos
 	bool CreateFileMappingObject(HANDLE file, FILESIZE set_size, jcvos::IFileMapping * & mapping);
 	bool CreateFileIterator(const std::wstring & fn, jcvos::IStreamIteratorA * & it);
 	
-	bool CreateFileMappingBuf(jcvos::IFileMapping * mapping, JCSIZE offset_sec, JCSIZE secs, jcvos::IBinaryBuffer * & buf);
+	bool CreateFileMappingBuf(jcvos::IFileMapping * mapping, size_t offset_sec, size_t secs, jcvos::IBinaryBuffer * & buf);
 	bool CreateFileMappingBufByte(jcvos::IBinaryBuffer * & buf, jcvos::IFileMapping * mapping, FILESIZE offset, FILESIZE len);
 
 	///////////////////////////////////////////////////////////////////////////////

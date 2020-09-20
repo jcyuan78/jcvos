@@ -8,7 +8,7 @@
 namespace jcvos
 {
 	class CColInfoList : public IColInfoList
-		, public CJCInterfaceBase
+		//, public CJCInterfaceBase
 		, CStringTable<CFieldDefinition, std::vector<const CFieldDefinition*> >
 	{
 	public:
@@ -19,8 +19,8 @@ namespace jcvos
 	public:
 		virtual void AddInfo(const CFieldDefinition* info);
 		virtual const CFieldDefinition * GetInfo(const CJCStringT & key) const;
-		virtual const CFieldDefinition * GetInfo(JCSIZE index) const;
-		virtual JCSIZE GetColNum(void) const {return LIST_BASE::GetSize();}
+		virtual const CFieldDefinition * GetInfo(size_t index) const;
+		virtual size_t GetColNum(void) const {return LIST_BASE::GetSize();}
 
 		virtual void OutputHead(IJCStream * stream) const;
 	};
@@ -31,10 +31,11 @@ namespace jcvos
 	class CGeneralTable;
 
 	class CGeneralRow : public ITableRow
-		, public CJCInterfaceBase
+		//, public CJCInterfaceBase
 	{
 	protected:
-		CGeneralRow(IColInfoList * info);
+		CGeneralRow(void);
+		void Init(IColInfoList * info);
 		virtual ~CGeneralRow(void);
 	public:
 		static void CreateGeneralRow(IColInfoList * info, CGeneralRow * &row);
@@ -47,7 +48,7 @@ namespace jcvos
 		virtual void SetValueText(LPCTSTR str);
 
 		// ITableRow
-		virtual int GetColumnSize() const;
+		virtual size_t GetColumnSize() const;
 		virtual const CFieldDefinition * GetColumnInfo(LPCTSTR field_name) const;
 		virtual const CFieldDefinition * GetColumnInfo(int field) const;
 		// 从一个通用的行中取得通用的列数据
@@ -63,9 +64,9 @@ namespace jcvos
 		void GetColumnData(const CFieldDefinition *info, IValue * &)	const;
 
 	protected:
-		JCSIZE	m_col_num;
+		size_t	m_col_num;
 		TCHAR	* m_data;
-		JCSIZE	m_data_len;
+		size_t	m_data_len;
 		//每个字段在行中的偏移量，行的长度不超过64K字符
 		struct FIELDS
 		{
@@ -78,10 +79,11 @@ namespace jcvos
 	};
 
 	class CGeneralTable : virtual public ITable
-				, public CJCInterfaceBase
+				//, public CJCInterfaceBase
 	{
 	public:
-		CGeneralTable(IColInfoList * info);
+		CGeneralTable(void);
+		void Init(IColInfoList * info);
 		virtual ~CGeneralTable(void);
 
 	public:
@@ -97,10 +99,10 @@ namespace jcvos
 
 		// IVector
 		virtual void PushBack(IValue * val);
-		virtual void GetRow(JCSIZE index, IValue * & val);
-		virtual JCSIZE GetRowSize() const;
+		virtual void GetRow(size_t index, IValue * & val);
+		virtual size_t GetRowSize() const;
 		// ITable
-		virtual JCSIZE GetColumnSize() const;
+		virtual size_t GetColumnSize() const;
 		//virtual bool GetColumn(int filed, IVector * &) const	= 0;
 		//virtual const CFieldDefinition * GetColumnInfo(LPCTSTR field_name) const = 0;
 		//virtual const CFieldDefinition * GetColumnInfo(int field) const = 0;
@@ -138,8 +140,8 @@ namespace jcvos
 	//	virtual void SetValueText(LPCTSTR str) {/* DO NOT SUPPORT*/};
 	//	// read only
 	//	virtual void PushBack(IValue * val){/* DO NOT SUPPORT*/};
-	//	virtual void GetRow(JCSIZE index, IValue * & val);
-	//	virtual JCSIZE GetRowSize() const;
+	//	virtual void GetRow(size_t index, IValue * & val);
+	//	virtual size_t GetRowSize() const;
 
 	//protected:
 	//	CGeneralTable * m_table;

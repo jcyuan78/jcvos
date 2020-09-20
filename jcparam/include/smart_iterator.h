@@ -33,15 +33,15 @@ namespace jcvos
 	class CEndIterator : public IStreamIterator<CharType>
 	{
 	public:
-		CEndIterator(void) : m_ref(1) {};
+		CEndIterator(void) /*: m_ref(1)*/ {};
 		virtual ~CEndIterator(void) {};
-		IMPLEMENT_INTERFACE;
+		//IMPLEMENT_INTERFACE;
 
 	public:
 		virtual void Forward(void) {JCASSERT(0);}
-		virtual void Duplicate(IStreamIterator * & it) const 
+		virtual void Duplicate(IStreamIterator<CharType> * & it) const 
 		{it = const_cast<IStreamIterator<CharType>*>(static_cast<const IStreamIterator<CharType>*>(this)); it->AddRef();}
-		virtual bool Duplicate(IStreamIterator * it, size_t buf_len) const {return false;}
+		virtual bool Duplicate(IStreamIterator<CharType> * it, size_t buf_len) const {return false;}
 		virtual bool Equal(const IStreamIterator<CharType> * it) const {return it->IsEnd();}
 		virtual CharType & GetElement(void) {JCASSERT(0); return dummy;}
 		virtual const CharType & GetElement(void) const {JCASSERT(0); return dummy;}

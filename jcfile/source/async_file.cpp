@@ -117,7 +117,7 @@ void CAsyncOutputFile::Put(const wchar_t * buf, size_t buf_size)
 
 	// fill data
 	char * line_buf = m_line_bufs[cache_id].m_buf;
-	int len = 0;
+	size_t len = 0;
 	{
 	//LOG_STACK_PERFORM(_T("-Convert"));
 	len = jcvos::UnicodeToUtf8(line_buf, MAX_LINE_BUF-2, buf, buf_size);

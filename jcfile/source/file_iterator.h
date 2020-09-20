@@ -9,9 +9,10 @@ class CFileIterator : public jcvos::IStreamIteratorA
 {
 protected:
 	CFileIterator(void);
-	CFileIterator(const std::wstring &file_name);
+	//CFileIterator(const std::wstring &file_name);
+	void Init(const std::wstring &file_name);
 	virtual ~CFileIterator(void);
-	IMPLEMENT_INTERFACE;
+	//IMPLEMENT_INTERFACE;
 	static const size_t	BUF_SIZE = 64*1024;
 public:
 	friend bool jcvos::CreateFileIterator(const std::wstring &, jcvos::IStreamIteratorA * &);

@@ -9,10 +9,10 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(WORKSPACE)\jcvos2\stdext;$(WORKSPACE)\jcvos2\jcparam;$(WORKSPACE)\jcvos2\jcapp;$(WORKSPACE)\jcvos2\\jcfile;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WORKSPACE)\jcvos2\stdext;$(WORKSPACE)\jcvos2\jcparam;$(WORKSPACE)\jcvos2\jcapp;$(WORKSPACE)\jcvos2\jcfile;$(WORKSPACE)\jcvos2\mfcext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(BUILD_DIR)\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BUILD_DIR)\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

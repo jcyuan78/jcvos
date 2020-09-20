@@ -5,8 +5,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>15.0.26730.12</_ProjectFileVersion>
-    <OutDir>$(BUILD_DIR)\lib\$(Configuration)\</OutDir>
-    <IntDir>$(BUILD_DIR)\$(ProjectName)\$(Configuration)\</IntDir>
+    <OutDir>$(BUILD_DIR)\lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(BUILD_DIR)\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup />

@@ -25,7 +25,7 @@ jcvos::CJCException::~CJCException(void) throw()
 
 const char * jcvos::CJCException::what() const throw()
 {
-	//JCSIZE src_len = m_err_msg.size();
+	//size_t src_len = m_err_msg.size();
 	std::string & tmp = const_cast<std::string &>(m_msg_utf8);
 	//UnicodeToUtf8(tmp, m_err_msg.c_str(), src_len);
 	UnicodeToUtf8(tmp, m_err_msg);

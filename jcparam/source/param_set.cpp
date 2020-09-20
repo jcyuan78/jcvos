@@ -9,12 +9,6 @@ LOCAL_LOGGER_ENABLE(_T("parameter"), LOGGER_LEVEL_DEBUGINFO);
 
 LOG_CLASS_SIZE( CTypedValueBase )
 
-//LOG_CLASS_SIZE_T1(CTypedValue, INT64)
-//LOG_CLASS_SIZE_T1(CTypedValue, int)
-//LOG_CLASS_SIZE_T1(CTypedValue, CJCStringT)
-
-
-
 ///////////////////////////////////////////////////////////////////////////////
 
 jcvos::IValue * jcvos::CreateTypedValue(jcvos::VALUE_TYPE vt, void * data)
@@ -22,8 +16,12 @@ jcvos::IValue * jcvos::CreateTypedValue(jcvos::VALUE_TYPE vt, void * data)
 	IValue * val = NULL;
 	switch (vt)
 	{
-	case jcvos::VT_CHAR:
-		val = CTypedValue<char>::Create( (data)?*((const char *)data):(0) );					
+	case jcvos::VT_CHAR: {
+		//val = CTypedValue<char>::Create( (data)?*((const char *)data):(0) );					
+		_CTypedValue<char> * _val = CTypedValue<char>::Create();
+		_val->Set((data) ? *((const char *)data) : (0));
+		val = static_cast<IValue*>(_val);
+	}
 		break;
 	case jcvos::VT_UCHAR:		val = CTypedValue<unsigned char>::Create();		break;
 	case jcvos::VT_SHORT:		val = CTypedValue<short>::Create();				break;
@@ -60,11 +58,11 @@ static const VALUE_TYPE_PAIR value_type_index[] = {
 	VALUE_TYPE_PAIR(_T("string"), jcvos::VT_STRING),
 };
 
-const JCSIZE value_type_number = sizeof (value_type_index) / sizeof(VALUE_TYPE_PAIR);
+const size_t value_type_number = sizeof (value_type_index) / sizeof(VALUE_TYPE_PAIR);
 
 VALUE_TYPE jcvos::StringToType(LPCTSTR str)
 {
-	for (JCSIZE ii = 0; ii < value_type_number; ++ii)
+	for (size_t ii = 0; ii < value_type_number; ++ii)
 		if ( _tcscmp(str, value_type_index[ii].first) == 0) return value_type_index[ii].second;
 	return jcvos::VT_UNKNOW;
 }
@@ -150,6 +148,6 @@ bool CParamSet::RemoveValue(LPCTSTR param_name)
 		return true;
 	}
 	else	return false;
-	//JCSIZE ii = m_param_map.erase(param_name);
+	//size_t ii = m_param_map.erase(param_name);
 	//if (0 == ii)	THROW_ERROR(ERR_PARAMETER, _T(""))
 }

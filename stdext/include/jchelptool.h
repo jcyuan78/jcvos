@@ -1,7 +1,9 @@
 ﻿#pragma once
 
 #include "jcexception.h"
+
 extern const double ts_cycle;
+
 namespace jcvos
 {
 	class CJCHelpTool
@@ -15,7 +17,7 @@ namespace jcvos
 		static int PathRel2Abs(LPCTSTR cur_path, LPCTSTR rel_path, CJCStringT & abs_path);
 	};
 
-	int UnicodeToUtf8(char *strDest, size_t nDestLen, const wchar_t *szSrc, size_t nSrcLen);
+	size_t UnicodeToUtf8(char *strDest, size_t nDestLen, const wchar_t *szSrc, size_t nSrcLen);
 	size_t Utf8ToUnicode(wchar_t *strDest, size_t nDestLen, const char *szSrc, size_t nSrcLen);
 
 	bool ParseFileName(const std::wstring & src_fn, std::wstring & path, std::wstring & fn);

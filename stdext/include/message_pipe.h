@@ -15,7 +15,7 @@ namespace jcvos
 
 	class CMessagePipe
 #ifndef USE_TEMPLAE_SINGLETONE
-		: public CSingleToneBase
+		: public CSingleTonBase
 #endif
 	{
 	public:
@@ -48,7 +48,7 @@ namespace jcvos
 		static CMessagePipe* Instance(void)
 		{
 			static CMessagePipe* instance = NULL;
-			if (instance == NULL)	CSingleToneEntry::GetInstance<CMessagePipe >(instance);
+			if (instance == NULL)	CSingleTonEntry::GetInstance<CMessagePipe >(instance);
 			return instance;
 		}
 #endif
@@ -59,7 +59,7 @@ namespace jcvos
 #ifndef USE_TEMPLAE_SINGLETONE
 	typedef CMessagePipe MESSAGE_PIPE;
 #else
-	//typedef CGlobalSingleTone<CMessagePipe>		MESSAGE_PIPE;
+	//typedef CGlobalSingleTon<CMessagePipe>		MESSAGE_PIPE;
 	typedef CGlobalSingleToneNet<CMessagePipe>		MESSAGE_PIPE;
 #endif
 };

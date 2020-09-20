@@ -7,6 +7,7 @@
 #include "include/jcinterface.h"
 #include "include/jchelptool.h"
 #include "include/message_pipe.h"
+#include "include/single_tone.h"
 
 #pragma comment (lib, "stdext.lib")
 

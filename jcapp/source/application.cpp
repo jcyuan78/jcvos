@@ -32,20 +32,6 @@ void AppArguSupport::EnableDstFileParam(TCHAR abbr)
 
 bool AppArguSupport::CmdLineParse(BYTE * base)
 {
-	// set default value to arguments
-	// input output support
-	//if (m_prop & ARGU_SUPPORT_INFILE)
-	//{
-	//	m_cmd_parser.AddParamDefine( new jcvos::CArguDescBase(ARGU_SRC_FN, 
-	//		ABBR_SRC_FN, jcvos::VT_STRING, _T("input file, default stdin")) );
-	//}
-
-	//if (m_prop & ARGU_SUPPORT_OUTFILE)
-	//{
-	//	m_cmd_parser.AddParamDefine( new jcvos::CArguDescBase(ARGU_DST_FN, 
-	//		ABBR_DST_FN, jcvos::VT_STRING, _T("output file, default stdout")) );
-	//}
-
 	if (m_prop & ARGU_SUPPORT_HELP)
 	{
 		m_cmd_parser.AddParamDefine( new jcvos::CArguDescBase(ARGU_HELP,
@@ -54,7 +40,8 @@ bool AppArguSupport::CmdLineParse(BYTE * base)
 
 	m_cmd_parser.InitializeArguments(base);
 
-	bool br = m_cmd_parser.Parse(GetCommandLine(), base);
+	bool br = true;
+	br=m_cmd_parser.Parse(GetCommandLine(), base);
 	m_cmd_parser.m_remain.GetValT(ARGU_SRC_FN, m_src_fn);
 	m_cmd_parser.m_remain.GetValT(ARGU_DST_FN, m_dst_fn);
 	if ( m_cmd_parser.m_remain.Exist(ARGU_HELP) ) throw std::exception("show help\n");
@@ -140,7 +127,8 @@ CJCAppBase * CJCAppBase::GetApp(void)
 
 bool CJCAppBase::LoadApplicationInfo(void)
 {
-#ifdef WIN32
+//#ifdef WIN32
+#if 0
 	jcvos::auto_array<TCHAR> _str_temp(MAX_PATH);
 	TCHAR * str_temp = _str_temp;
 
@@ -198,7 +186,7 @@ int jcvos::local_main(int argc, _TCHAR* argv[])
 {
 	int ret_code = 0;
 	CJCAppBase * app = CJCAppBase::GetApp();
-	app->ShowAppInfo(stderr);
+	app->ShowAppInfo(stdout);
 	bool show_help = false;
 
 	JCASSERT(app);
@@ -220,7 +208,7 @@ int jcvos::local_main(int argc, _TCHAR* argv[])
 		std::cout << ex.what() << std::endl;
 		ret_code = -1;
 		show_help = true;
-		std::wcout << _T("press any key to continue..");
+		std::wcout << _T("\n press any key to continue..");
 		getc(stdin);
     }
 	if (show_help ) app->ShowHelpInfo(stdout);

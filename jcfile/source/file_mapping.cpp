@@ -147,7 +147,7 @@ void CFileMapping::SetSize(FILESIZE size)
 	m_file_size = size;
 }
 
-LPVOID CFileMapping::Mapping(FILESIZE offset, JCSIZE len)
+LPVOID CFileMapping::Mapping(FILESIZE offset, size_t len)
 {
 	// 指针对齐
 	LOG_STACK_TRACE();
@@ -163,7 +163,7 @@ LPVOID CFileMapping::Mapping(FILESIZE offset, JCSIZE len)
 
 /*
 	FILESIZE aligned_start = ((offset -1) & m_grn_mask) + m_granularity;
-	JCSIZE aligned_len = (JCSIZE)(((len -1) & m_grn_mask) + m_granularity);
+	size_t aligned_len = (size_t)(((len -1) & m_grn_mask) + m_granularity);
 	LOG_DEBUG(_T("request start:0x%08I64X, len:0x%08X"), offset, len);
 	LOG_DEBUG(_T("aligned start:0x%08I64X, len:0x%08X"), aligned_start, aligned_len);
 
@@ -202,7 +202,7 @@ void CFileMapping::Unmapping(LPVOID ptr)
 	for (; it!= endit; ++it)
 	{
 		VIEW_NODE & view = *it;
-		if ( (ptr >= view.ptr) && ( (JCSIZE)(ptr - view.ptr) < view.length) )
+		if ( (ptr >= view.ptr) && ( (size_t)(ptr - view.ptr) < view.length) )
 		{
 			if (InterlockedDecrement(&view.ref_cnt) == 0)
 			{
@@ -215,12 +215,12 @@ void CFileMapping::Unmapping(LPVOID ptr)
 */
 }
 
-void CFileMapping::InsertView(BYTE * ptr, FILESIZE start, JCSIZE len)
+void CFileMapping::InsertView(BYTE * ptr, FILESIZE start, size_t len)
 {
 	m_view_list.push_back(VIEW_NODE(ptr, start, len));
 }
 
-CFileMapping::VIEW_NODE * CFileMapping::FindView(FILESIZE start, JCSIZE len)
+CFileMapping::VIEW_NODE * CFileMapping::FindView(FILESIZE start, size_t len)
 {
 	VIEW_LIST::iterator it = m_view_list.begin();
 	VIEW_LIST::iterator endit = m_view_list.end();

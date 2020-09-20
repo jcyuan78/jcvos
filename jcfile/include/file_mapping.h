@@ -27,21 +27,21 @@ protected:
 protected:
 	struct VIEW_NODE
 	{
-		VIEW_NODE(BYTE * _ptr, FILESIZE _start, JCSIZE len) 
+		VIEW_NODE(BYTE * _ptr, FILESIZE _start, size_t len) 
 			: ptr(_ptr), start(_start), length(len), ref_cnt(1)
 		{ }
 		BYTE * ptr;
 		FILESIZE start;
-		JCSIZE length;
+		size_t length;
 		LONG ref_cnt;
 	};
-	//typedef std::map<JCSIZE, VIEW_NODE>	VIEW_MAP;
+	//typedef std::map<size_t, VIEW_NODE>	VIEW_MAP;
 	typedef std::vector<VIEW_NODE>		VIEW_LIST;
 
 public:
 	virtual void SetSize(FILESIZE size);
 	virtual FILESIZE GetSize(void) const {return m_file_size;}
-	virtual LPVOID Mapping(FILESIZE offset, JCSIZE len);
+	virtual LPVOID Mapping(FILESIZE offset, size_t len);
 	virtual void Unmapping(LPVOID ptr);
 	virtual UINT64 GetGranul(void) {return m_granularity;};
 	// 向下对其
@@ -57,8 +57,8 @@ public:
 		return aligned;
 	}
 protected:
-	VIEW_NODE * FindView(FILESIZE start, JCSIZE len);
-	void InsertView(BYTE * ptr, FILESIZE start, JCSIZE len);
+	VIEW_NODE * FindView(FILESIZE start, size_t len);
+	void InsertView(BYTE * ptr, FILESIZE start, size_t len);
 
 protected:
 	HANDLE	m_src_file;

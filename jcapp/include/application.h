@@ -2,6 +2,7 @@
 
 #include "../local_config.h"
 #include "../../jcparam/jcparam.h"
+#include "../../stdext/stdext.h"
 
 #ifdef WIN32
 #pragma comment (lib, "version.lib")
@@ -182,7 +183,7 @@ namespace jcvos
 	};
 
 	template <class BASE>
-	class CJCApp : public BASE, public CSingleToneBase
+	class CJCApp : public BASE, public CSingleTonBase
 	{
 	public:
 		CJCApp(void)
@@ -190,10 +191,10 @@ namespace jcvos
 #if APP_GLOBAL_SINGLE_TONE > 0
 			// register app pointer to single tone
 			CSingleToneEntry * entry = CSingleToneEntry::Instance();
-			CSingleToneBase * ptr = NULL;
+			CSingleTonBase * ptr = NULL;
 			entry->QueryStInstance(GetGuid(), ptr);
 			JCASSERT(ptr == NULL);
-			entry->RegisterStInstance(GetGuid(), static_cast<CSingleToneBase *>(this) );
+			entry->RegisterStInstance(GetGuid(), static_cast<CSingleTonBase *>(this) );
 #else
 			// register app pointer to jcapp base
 			JCASSERT(CJCAppBase::m_instance == NULL);
@@ -205,17 +206,17 @@ namespace jcvos
 				| CJCLogger::COL_FUNCTION_NAME
 				| CJCLogger::COL_REAL_TIME
 				);
-#ifdef _DEBUG
-			// 调试版本：log配置文件位于当前目录
-			LOGGER_CONFIG(BASE::LOG_CONFIG_FN);
-#else
+//#ifdef _DEBUG
+//			// 调试版本：log配置文件位于当前目录
+//			LOGGER_CONFIG(BASE::LOG_CONFIG_FN);
+//#else
 			// log配置文件置于exe文件相同目录
 			std::wstring app_path;
 			GetAppPath(app_path);
 			//(app_path += _T("\\"));
 			std::wstring file_name = /*app_path + */BASE::LOG_CONFIG_FN;
 			LOGGER_CONFIG(file_name.c_str(), app_path.c_str());
-#endif
+//#endif
 		}
 		virtual ~CJCApp(void) {}
 

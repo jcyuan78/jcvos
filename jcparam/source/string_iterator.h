@@ -9,14 +9,17 @@ template <typename CharType>
 class CStringIterator : public jcvos::IStreamIterator<CharType>
 {
 protected:
-	inline CStringIterator(CharType * buf, CharType * ptr);
-	CStringIterator(const CharType * str);
+	//inline CStringIterator(CharType * buf, CharType * ptr);
+	//CStringIterator(const CharType * str);
 	virtual ~CStringIterator(void);
+	void Init(CharType * buf, CharType * ptr);
+	void Init(const CharType * str);
+
 
 public:
 	template <typename CharType>
 	friend bool jcvos::CreateStringIterator(const CharType *, jcvos::IStreamIterator<CharType> * &);
-	IMPLEMENT_INTERFACE;
+	//IMPLEMENT_INTERFACE;
 
 public:
 	virtual void Forward(void) {m_ptr++;};

@@ -6,13 +6,14 @@
 LOG_CLASS_SIZE(CFileIterator);
 
 CFileIterator::CFileIterator(void)
-: m_ref(1), m_file_mapping(NULL), m_buf(NULL)
+: /*m_ref(1),*/ m_file_mapping(NULL), m_buf(NULL)
 {
 }
 
-CFileIterator::CFileIterator(const std::wstring &file_name)
-: m_ref(1), m_file_mapping(NULL)
+void CFileIterator::Init(const std::wstring &file_name)
+//: m_ref(1), m_file_mapping(NULL)
 {
+	m_file_mapping=NULL;
 	jcvos::CreateFileMappingObject(m_file_mapping, file_name);	JCASSERT(m_file_mapping);
 	LoadBuffer(0, 0);
 }
@@ -37,7 +38,7 @@ void CFileIterator::Forward(void)
 void CFileIterator::Duplicate(jcvos::IStreamIteratorA * & it) const
 {
 	JCASSERT(it == NULL);
-	CFileIterator * _it = new CFileIterator;
+	CFileIterator * _it = jcvos::CDynamicInstance<CFileIterator>::Create();
 	_it->m_file_mapping = m_file_mapping;	_it->m_file_mapping->AddRef();
 	//_it->m_file_size = m_file_size;
 	_it->LoadBuffer(m_buf_id, m_ptr-m_buf);
@@ -50,7 +51,9 @@ bool CFileIterator::Duplicate(jcvos::IStreamIteratorA * it, size_t buf_len) cons
 	JCASSERT(it);
 	if (buf_len < sizeof(CFileIterator) ) return false;
 	CFileIterator *_it = reinterpret_cast<CFileIterator*>(it);
-	new(_it) CFileIterator;
+	//new(_it) CFileIterator;
+	// <TODO> : 此处需要检查正确性
+	_it->m_buf = NULL, _it->m_file_mapping = NULL;
 	_it->AddRef();	// 放置构造不需要分配内存，强制m_ref>1，永远不析构。
 	_it->m_file_mapping = m_file_mapping;
 	_it->m_file_mapping->AddRef();	
@@ -107,6 +110,9 @@ void CFileIterator::LoadBuffer(FILESIZE buf_id, size_t offset)
 bool jcvos::CreateFileIterator(const std::wstring & fn, jcvos::IStreamIteratorA * & it)
 {
 	JCASSERT(it == NULL);
-	it = static_cast<jcvos::IStreamIteratorA*>(new CFileIterator(fn));
+	auto _it = jcvos::CDynamicInstance<CFileIterator>::Create();
+	_it->Init(fn);
+	//it = static_cast<jcvos::IStreamIteratorA*>(new CFileIterator(fn));
+	it = static_cast<jcvos::IStreamIteratorA*>(_it);
 	return true;
 }

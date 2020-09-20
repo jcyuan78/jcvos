@@ -123,6 +123,9 @@ namespace jcvos
 	public:
 		typedef TYPE * PTYPE;
 		explicit auto_ptr(TYPE * ptr) : m_ptr(ptr) {/* JCASSERT(m_ptr); */};
+		explicit auto_ptr(TYPE * ptr, int val) : m_ptr(ptr) {
+			JCASSERT(m_ptr); memset(m_ptr, val, sizeof(TYPE));
+		};
 		explicit auto_ptr(void)	: m_ptr(new TYPE) {};
 		~auto_ptr(void)			{ delete m_ptr; };
 
@@ -149,20 +152,22 @@ namespace jcvos
 	public:
 		explicit auto_array(PTR_TYPE * ptr)		: m_ptr(ptr), m_size(0) {};
 		explicit auto_array(size_t size)		: m_ptr(new PTR_TYPE[size]), m_size(size)	{};
-		explicit auto_array(size_t size, PTR_TYPE val)	: m_ptr(new PTR_TYPE[size]), m_size(size)
+		explicit auto_array(size_t size, BYTE val)	: m_ptr(new PTR_TYPE[size]), m_size(size)
 		{
 			memset(m_ptr, val, sizeof(PTR_TYPE)*size);
 		};
 		~auto_array(void)					{ delete [] m_ptr; m_ptr = NULL;};
 
 		operator PTR_TYPE* () const	{ return m_ptr; };
-		PTR_TYPE* operator + (int offset)	{ return m_ptr + offset; };
+		PTR_TYPE* operator + (size_t offset)	{ return m_ptr + offset; };
 
 		operator void * ()					{ return (void*)m_ptr;};
 
-		PTR_TYPE & operator [] (int ii)			{ return m_ptr[ii]; };
+		PTR_TYPE & operator [] (size_t ii)			{ return m_ptr[ii]; };
 		// return size in byte
 		const size_t size() const {return m_size * sizeof(PTR_TYPE);};
+		// return size in element
+		const size_t len() const { return m_size; }
 
 	protected:
 		PTR_TYPE * m_ptr;
@@ -173,7 +178,7 @@ namespace jcvos
 	class auto_buffer
 	{
 	public:
-		explicit auto_buffer(JCSIZE size)
+		explicit auto_buffer(size_t size)
 			: m_ptr( (PTR_TYPE) malloc(size) )
 			, m_size(size)
 		{};
@@ -183,9 +188,14 @@ namespace jcvos
 		PTR_TYPE operator ->() {return m_ptr; }
 		operator PTR_TYPE &() { return m_ptr; };
 
+//		BYTE* operator + (int offset) { return m_ptr + offset; };
+//		operator void * () { return (void*)m_ptr; };
+
+//		BYTE & operator [] (int ii) { return m_ptr[ii]; };
+
 	protected:
 		PTR_TYPE m_ptr;
-		JCSIZE m_size;
+		size_t m_size;
 	};
 
 
@@ -193,7 +203,7 @@ namespace jcvos
 	class auto_buf
 	{
 	public:
-		explicit auto_buf(JCSIZE size, LPVOID ptr = NULL)		
+		explicit auto_buf(size_t size, LPVOID ptr = NULL)		
 			: m_ptr( (BYTE*)VirtualAlloc(ptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE) )
 			, m_size(size)
 		{};
@@ -210,18 +220,18 @@ namespace jcvos
 
 	protected:
 		BYTE * m_ptr;
-		JCSIZE m_size;
+		size_t m_size;
 	};
 #endif
 
-	template <JCSIZE ALIGNE, typename PTR_TYPE = BYTE>
+	template <size_t ALIGNE, typename PTR_TYPE = BYTE>
 	class auto_aligne_buf
 	{
 	public:
 		static const DWORD MASK = (~ALIGNE) + 1; 
-		explicit auto_aligne_buf(JCSIZE size)
+		explicit auto_aligne_buf(size_t size)
 		{
-			JCSIZE buf_size = (size > ALIGNE) ? (size + ALIGNE) : (size + 2 * ALIGNE);
+			size_t buf_size = (size > ALIGNE) ? (size + ALIGNE) : (size + 2 * ALIGNE);
 			m_buf = new BYTE[buf_size];
 			m_aligne = (BYTE*)(((DWORD)(m_buf) & MASK) + ALIGNE);
 		}
@@ -275,7 +285,7 @@ namespace jcvos
 		{
 			JCASSERT(NULL == type);
 			type = dynamic_cast<TRG_TYPE*>(m_ptr);
-			JCASSERT(type);
+			JCASSERT(!m_ptr || type);		// m_ptr => type
 			m_ptr = NULL;
 		};
 

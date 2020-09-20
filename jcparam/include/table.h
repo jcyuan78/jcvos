@@ -9,7 +9,7 @@ namespace jcvos
 	class CTypedColInfo : public CFieldDefinition
 	{
 	public:
-		CTypedColInfo (int id, JCSIZE offset, LPCTSTR name)
+		CTypedColInfo (int id, size_t offset, LPCTSTR name)
 			: CFieldDefinition(/*id, type_id<VAL_TYPE>::id(), */offset, sizeof(VAL_TYPE), name)
 		{	JCASSERT(1);
 		};
@@ -57,7 +57,7 @@ namespace jcvos
 	class CStringColInfo : public CFieldDefinition
 	{
 	public:
-		CStringColInfo (/*int id, */JCSIZE offset, LPCTSTR name)
+		CStringColInfo (/*int id, */size_t offset, LPCTSTR name)
 			: CFieldDefinition(/*id, VT_STRING,*/ offset, sizeof(CJCStringT*), name)
 		{};
 
@@ -65,20 +65,17 @@ namespace jcvos
 		{
 			JCASSERT(stream);
 			CJCStringT * str = (reinterpret_cast<CJCStringT*>((BYTE*)row + m_offset));
-			stream->Put(str->c_str(), (JCSIZE)str->length() );
+			stream->Put(str->c_str(), (size_t)str->length() );
 		}
-
-		//virtual void FromStream(void * row, std::istream & stream) const
-		//{
-		//	JCASSERT(row);
-		//	CJCStringT * str = reinterpret_cast<CJCStringT*>((BYTE*)row + m_offset); JCASSERT(str);
-		//}
 
 		virtual void CreateValue(BYTE * src, IValue * & val) const
 		{
 			JCASSERT(NULL == val);
 			BYTE * p = src + m_offset;
-			val = CTypedValue<CJCStringT>::Create(*(reinterpret_cast<CJCStringT*>(p)));
+			//val = CTypedValue<CJCStringT>::Create(*(reinterpret_cast<CJCStringT*>(p)));
+			_CTypedValue<CJCStringT> * _val = CTypedValue<CJCStringT>::Create();
+			_val->Set(*(reinterpret_cast<CJCStringT*>(p)));
+			val = static_cast<IValue*>(_val);
 		}
 		//--
 		virtual bool ParseFromStream(void * row, jcvos::IStreamIteratorA * it) const;
@@ -88,7 +85,7 @@ namespace jcvos
 	class CFDHex : public CFieldDefinition
 	{
 	public:
-		CFDHex(JCSIZE offset, LPCTSTR name, JCSIZE width) 
+		CFDHex(size_t offset, LPCTSTR name, size_t width) 
 			: CFieldDefinition(offset, sizeof(val_type), name), m_width(width)
 		{ }
 
@@ -98,7 +95,7 @@ namespace jcvos
 
 		virtual bool ParseFromStream(void * row, jcvos::IStreamIteratorA * it) const;
 	protected:
-		JCSIZE m_width;
+		size_t m_width;
 	};
 
 };

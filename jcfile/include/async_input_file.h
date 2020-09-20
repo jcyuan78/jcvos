@@ -31,9 +31,10 @@ namespace jcvos
 		friend bool CreateAsyncInputFile(const std::wstring & fn, CAsyncInputFile *& file);
 
 	protected:
-		CAsyncInputFile(const std::wstring & fn);
+		CAsyncInputFile(void);
+		void Init(const std::wstring & fn);
 		virtual ~CAsyncInputFile(void);
-		IMPLEMENT_INTERFACE;
+		//IMPLEMENT_INTERFACE;
 
 	public:
 		bool ReadLine(char * buf, size_t buf_size);

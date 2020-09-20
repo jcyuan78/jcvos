@@ -22,8 +22,8 @@ namespace jcvos
 			return true; 
 		}
 
-		bool GetCommand(JCSIZE index, CJCStringT & cmd);
-		bool GetCommand(JCSIZE index, IValue * & val);
+		bool GetCommand(size_t index, std::wstring & cmd);
+		bool GetCommand(size_t index, IValue * & val);
 		void AddValue(const CJCStringT & name, IValue * value);
 		bool Exist(const CJCStringT & name);
 	};
@@ -45,7 +45,7 @@ namespace jcvos
 		CJCStringT		mName;			// 参数名称
 		TCHAR			mAbbrev;		// 略称
 		VALUE_TYPE		mValueType;		// 值类型，降值解释为数字或者是字符串。对于COMMAND和SWITCH，忽略此项。
-		JCSIZE			m_offset;		
+		size_t			m_offset;		
 		LPCTSTR			mDescription;
 	};	
 
@@ -53,13 +53,13 @@ namespace jcvos
 	class CTypedArguDesc : public CArguDescBase
 	{
 	public:
-		CTypedArguDesc(LPCTSTR name, TCHAR abbrev, JCSIZE offset, LPCTSTR desc = NULL)
+		CTypedArguDesc(LPCTSTR name, TCHAR abbrev, size_t offset, LPCTSTR desc = NULL)
 			: CArguDescBase(name, abbrev, ( type_id<ARG_TYPE>::id() ), desc)
 		{
 			m_offset = offset;
 		}
 
-		CTypedArguDesc(LPCTSTR name, TCHAR abbrev, JCSIZE offset, const ARG_TYPE default_val,
+		CTypedArguDesc(LPCTSTR name, TCHAR abbrev, size_t offset, const ARG_TYPE default_val,
 			LPCTSTR desc = NULL)
 			: CArguDescBase(name, abbrev, ( type_id<ARG_TYPE>::id() ), desc)
 			, m_default_val(default_val)
@@ -89,7 +89,7 @@ namespace jcvos
 		const ARG_TYPE & var,									// 用于自动类型识别
 		LPCTSTR name,									// 参数名称
 		TCHAR abbrev,									// 缩写
-		JCSIZE offset,									// 结构中的偏移量
+		size_t offset,									// 结构中的偏移量
 		LPCTSTR desc = NULL,
 		const ARG_TYPE &default_val = ARG_TYPE())		// 缺省值
 	{
@@ -124,15 +124,10 @@ namespace jcvos
 		bool AddParamDefine(const CArguDescBase *);
 		bool Parse(LPCTSTR cmd, BYTE * base);
 		bool InitializeArguments(BYTE * base);
-		
 
 		//}
 	protected:
-		//bool ParseToken(LPCTSTR token, JCSIZE len, BYTE * base);
 		bool OnToken(const CJCStringT & argu_name, LPCTSTR val, BYTE * base);
-		//bool dummy(LPCTSTR cmd, BYTE * base);
-		//bool GetToken(const wchar_t * & cmd, wchar_t * buf); 
-		//bool GetQuotation(const wchar_t * & cmd, wchar_t * & buf);
 
 
 	protected:
@@ -147,7 +142,7 @@ namespace jcvos
 		int					m_command_index;
 
 	public:
-		CArguSet			m_remain;
+		CStaticInstance<CArguSet>		m_remain;
 	};
 
 	class CArguDefList::RULE
@@ -181,13 +176,5 @@ namespace jcvos
 			}
 			return true;
 		}
-	
-
-
-	//protected:
-	//	static bool OnToken(const CArguDefList & param_def, LPCTSTR token, JCSIZE len, CArguSet & arg);
-
-	//protected:
-	//	static int		m_command_index;
 	};
 };

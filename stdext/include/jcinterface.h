@@ -19,43 +19,29 @@ protected:
 	virtual ~IJCInterface() {};
 };
 
-/*
-#define RELEASE(_i_)	{if (_i_) {_i_->Release(); _i_=NULL;}}
-*/
-
 // 这是RELEASE的一个线程安全版本，但是不适用于cmdlet
 template <class T>
-inline void RELEASE(T*& ptr)
+void RELEASE(T*& ptr)
 {
 	T* tmp = (T*)InterlockedExchangePointer((void**)&ptr, NULL);
 	if (tmp) tmp->Release();
 }
 
 template <class T>
-inline void ASSIGN(T*& dst, T* src)
+void ADDREF(T* ptr)
 {
-	dst = src;
-	if (dst) dst->AddRef();
+	if (ptr) ptr->AddRef();
 }
 
+//#define IMPLEMENT_INTERFACE		\
+//	protected:	\
+//	mutable __declspec(align(4))	long	m_ref;	\
+//	public:	\
+//	inline virtual void AddRef()			{	LockedIncrement(m_ref); }		\
+//	inline virtual void Release(void)		{	if (LockedDecrement(m_ref) == 0) delete this;	}	\
+//	virtual bool QueryInterface(const char * if_name, IJCInterface * &if_ptr) {return false;}
+//
 /*
-template <class T>
-void DELETE(T*& _i_)
-{
-	T* tmp = (T*)InterlockedExchangePointer(&_i_, NULL);
-	delete tmp;
-}
-*/
-
-#define IMPLEMENT_INTERFACE		\
-	protected:	\
-	mutable __declspec(align(4))	long	m_ref;	\
-	public:	\
-	inline virtual void AddRef()			{	LockedIncrement(m_ref); }		\
-	inline virtual void Release(void)		{	if (LockedDecrement(m_ref) == 0) delete this;	}	\
-	virtual bool QueryInterface(const char * if_name, IJCInterface * &if_ptr) {return false;}
-
-
 class CJCInterfaceBase : virtual public IJCInterface
 {
 protected:
@@ -91,7 +77,7 @@ public:
 		return false;
 	};
 };
-
+*/
 ///////////////////////////////////////////////////////////////////////////////
 // -- Implements
 namespace jcvos
@@ -100,13 +86,13 @@ namespace jcvos
 	class CDynamicInstance : public ImpClass
 	{
 	public:
+		template <typename P> CDynamicInstance(P & p) : m_ref(1), ImpClass(p) {};
 		CDynamicInstance<ImpClass>(void) : m_ref(1) {};
 		virtual ~CDynamicInstance<ImpClass>(void)	{};
-		static ImpClass * Create(void) 
+		static ImpClass * Create(void)
 		{
 			return static_cast<ImpClass*>(new jcvos::CDynamicInstance<ImpClass>);
 		}
-
 	protected:
 		mutable __declspec(align(4))	long	m_ref;
 	public:

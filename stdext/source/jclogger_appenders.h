@@ -13,7 +13,7 @@ namespace jclogger
 		virtual ~FileAppender(void);
 
 	public:
-		virtual void WriteString(LPCTSTR str, JCSIZE len);
+		virtual void WriteString(LPCTSTR str, size_t len);
 		virtual void Flush();
 
 	protected:
@@ -32,7 +32,7 @@ namespace jclogger
 	class CStdErrApd : public CJCLoggerAppender
 	{
 	public:
-		virtual void WriteString(LPCTSTR str, JCSIZE len)
+		virtual void WriteString(LPCTSTR str, size_t len)
 		{ 	fprintf_s(stderr, "%S\r", str);	}
 		virtual void Flush()	{}
 	};
@@ -40,7 +40,7 @@ namespace jclogger
 	class CNoneApd : public CJCLoggerAppender
 	{
 	public:
-		virtual void WriteString(LPCTSTR str, JCSIZE len)	{}
+		virtual void WriteString(LPCTSTR str, size_t len)	{}
 		virtual void Flush()	{}
 	};
 
@@ -52,7 +52,7 @@ namespace jclogger
 		virtual ~CDebugAppender(void);
 
 	public:
-		virtual void WriteString(LPCTSTR str, JCSIZE len);
+		virtual void WriteString(LPCTSTR str, size_t len);
 		virtual void Flush();
 	};
 #endif

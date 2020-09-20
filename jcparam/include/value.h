@@ -26,22 +26,25 @@ namespace jcvos
 		static LPCTSTR classname() {return EMPTY;};
 	};
 
+
 	template <typename DATATYPE, typename CONVERTOR = CConvertor<DATATYPE> >
-	class CTypedValue 
+	class _CTypedValue 
 		: virtual public IVisibleValue
-		, public CJCInterfaceBase
+		//, public CJCInterfaceBase
 		, public CTypedValueBase
 	{
 	public:
-		static CTypedValue * Create()	{return new CTypedValue();};
-		static CTypedValue * Create(const DATATYPE &d)	{return new CTypedValue(d);};
+		//static _CTypedValue * Create()	{return new _CTypedValue();};
+//		static _CTypedValue * Create(const DATATYPE &d)	{return new _CTypedValue(d);};
 	protected:
-		CTypedValue(void) {};
-		CTypedValue(const DATATYPE &d) : m_val(d) {}
-		CTypedValue(const CTypedValue<DATATYPE, CONVERTOR> & p) : m_val(p.m_val) 	{}
-		virtual ~CTypedValue(void) {}
+		_CTypedValue(void) {};
+		//_CTypedValue(const DATATYPE &d) : m_val(d) {}
+		_CTypedValue(const _CTypedValue<DATATYPE, CONVERTOR> & p) : m_val(p.m_val) 	{}
+		virtual ~_CTypedValue(void) {}
 
 	public:
+		void Set(const DATATYPE &d) { m_val = d; /*return new _CTypedValue(d);*/ };
+
 		virtual void GetValueText(CJCStringT & str) const 	
 		{
 			CONVERTOR::T2S(m_val, str);
@@ -52,7 +55,7 @@ namespace jcvos
 			CONVERTOR::S2T(str, m_val);
 		}
 
-		CTypedValue<DATATYPE, CONVERTOR> & operator = (const DATATYPE p)	
+		_CTypedValue<DATATYPE, CONVERTOR> & operator = (const DATATYPE p)	
 		{ 
 			m_val = p; return (*this);
 		}
@@ -60,7 +63,7 @@ namespace jcvos
 		operator DATATYPE & () {	return m_val; };
 		operator const DATATYPE & () const { return m_val;}
 
-		CTypedValue<DATATYPE, CONVERTOR> & operator = ( const CTypedValue<DATATYPE, CONVERTOR> & p) 
+		_CTypedValue<DATATYPE, CONVERTOR> & operator = ( const _CTypedValue<DATATYPE, CONVERTOR> & p) 
 		{
 			m_val = p.m_val; 
 			return (*this);
@@ -72,7 +75,7 @@ namespace jcvos
 			JCASSERT(stream);
 			CJCStringT str;
 			GetValueText(str);
-			stream->Put(str.c_str(), (JCSIZE)str.length() );
+			stream->Put(str.c_str(), (size_t)str.length() );
 		}
 
 		virtual void FromStream(IJCStream * str, VAL_FORMAT) { NOT_SUPPORT(return); };
@@ -91,7 +94,13 @@ namespace jcvos
 		DATATYPE m_val;
 	};
 
-	class CParamSet : virtual public IValue, public CJCInterfaceBase
+	template <typename DATATYPE, typename CONVERTOR = CConvertor<DATATYPE> >
+	class CTypedValue : public jcvos::CDynamicInstance< _CTypedValue<DATATYPE, CONVERTOR> >
+	{
+	};
+
+
+	class CParamSet : virtual public IValue/*, public CJCInterfaceBase*/
 	{
 	public:
 		typedef std::map<CJCStringT, IValue *>	PARAM_MAP;
@@ -101,7 +110,8 @@ namespace jcvos
 		static void Create(CParamSet * &val) 
 		{ 
 			JCASSERT(NULL==val);
-			val = new CParamSet(); 
+			//val = new CParamSet(); 
+			val = CDynamicInstance<CParamSet>::Create();
 		}
 		virtual void GetValueText(CJCStringT & str) const {};
 		virtual void SetValueText(LPCTSTR str)  {};
@@ -127,33 +137,6 @@ namespace jcvos
 
 	typedef std::vector<IValue *> VALUE_VECTOR;
 	typedef VALUE_VECTOR::iterator VALUE_ITERATOR;
-
-	/*
-	class CVector
-		: virtual public IVector
-		//, virtual public IValueFormat
-		, public CJCInterfaceBase
-	{
-	public:
-		CVector(void);
-		~CVector(void);
-
-	public:
-		virtual void GetValueText(CJCStringT & str) const {};
-		virtual void SetValueText(LPCTSTR str)  {};
-	
-		virtual void PushBack(IValue * val);
-		virtual void GetRow(JCSIZE index, IValue * & val);
-		virtual JCSIZE GetRowSize() const;
-
-	public:
-		virtual void GetSubValue(LPCTSTR name, IValue * & val) {};
-		virtual void SetSubValue(LPCTSTR name, IValue * val) {};
-
-	protected:
-		VALUE_VECTOR m_vector;
-	};
-	*/
 
 	typedef std::pair<CJCStringT, IValue*>	KVP;
 

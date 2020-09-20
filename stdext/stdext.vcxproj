@@ -97,41 +97,49 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DEBUG_DYNAMIC|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\build\external_libs.props" />
+    <Import Project="..\..\extlib\boost\support_boost.props" />
     <Import Project="..\build_jcvos.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='RELEASE_DYNAMIC|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\build\external_libs.props" />
+    <Import Project="..\..\extlib\boost\support_boost.props" />
     <Import Project="..\build_jcvos.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DEBUG_STATIC|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\build\external_libs.props" />
+    <Import Project="..\..\extlib\boost\support_boost.props" />
     <Import Project="..\build_jcvos.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='RELEASE_STATIC|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\build\external_libs.props" />
+    <Import Project="..\..\extlib\boost\support_boost.props" />
     <Import Project="..\build_jcvos.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DEBUG_DYNAMIC|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\build\external_libs.props" />
+    <Import Project="..\..\extlib\boost\support_boost.props" />
     <Import Project="..\build_jcvos.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='RELEASE_DYNAMIC|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\build\external_libs.props" />
+    <Import Project="..\..\extlib\boost\support_boost.props" />
     <Import Project="..\build_jcvos.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DEBUG_STATIC|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\build\external_libs.props" />
+    <Import Project="..\..\extlib\boost\support_boost.props" />
     <Import Project="..\build_jcvos.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='RELEASE_STATIC|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\build\external_libs.props" />
+    <Import Project="..\..\extlib\boost\support_boost.props" />
     <Import Project="..\build_jcvos.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -158,10 +166,7 @@
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DEBUG_DYNAMIC|Win32'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DEBUG_DYNAMIC|x64'">
-    <OutDir>$(SolutionDir)\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DEBUG_DYNAMIC|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RELEASE_STATIC|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\comm;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -277,7 +282,6 @@
   <ItemGroup>
     <ClCompile Include="source\jcexception.cpp" />
     <ClCompile Include="source\jchelptool.cpp" />
-    <ClCompile Include="source\jcinterface.cpp" />
     <ClCompile Include="source\jclogger_appenders.cpp" />
     <ClCompile Include="source\jclogger_base.cpp" />
     <ClCompile Include="source\message_pipe.cpp" />

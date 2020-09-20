@@ -17,9 +17,6 @@
     <ClCompile Include="source\jchelptool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\jcinterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\jclogger_appenders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

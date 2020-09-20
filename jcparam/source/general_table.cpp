@@ -10,7 +10,8 @@ using namespace jcvos;
 void CreateColumnInfoList(IColInfoList * & list)
 {
 	JCASSERT(NULL == list);
-	list = new CColInfoList;
+	//list = new CColInfoList;
+	list = CDynamicInstance<CColInfoList>::Create();
 }
 
 void CColInfoList::AddInfo(const CFieldDefinition* info)
@@ -23,7 +24,7 @@ const CFieldDefinition * CColInfoList::GetInfo(const CJCStringT & key) const
 	return LIST_BASE::GetItem(key);
 }
 
-const CFieldDefinition * CColInfoList::GetInfo(JCSIZE index) const
+const CFieldDefinition * CColInfoList::GetInfo(size_t index) const
 {
 	return LIST_BASE::GetItem(index);
 }
@@ -36,7 +37,7 @@ void CColInfoList::OutputHead(IJCStream * stream) const
 	for ( ; it!=endit; ++it)
 	{
 		const CJCStringT & name = it->first;
-		stream->Put(name.c_str(), (JCSIZE)name.length() );
+		stream->Put(name.c_str(), (size_t)name.length() );
 		stream->Put(_T(','));
 	}
 }
@@ -48,14 +49,25 @@ void CColInfoList::OutputHead(IJCStream * stream) const
 void CGeneralRow::CreateGeneralRow(IColInfoList * info, CGeneralRow * &row)
 {
 	JCASSERT(NULL == row);
-	row = new CGeneralRow(info);
+	//row = new CGeneralRow(info);
+	row = CDynamicInstance<CGeneralRow>::Create();
+	row->Init(info);
 }
 
-CGeneralRow::CGeneralRow(IColInfoList * info)
-	: m_col_info(info)
+CGeneralRow::CGeneralRow(void)
+	: m_col_info(NULL)
 	, m_fields(NULL)
 	, m_data(NULL)
 {
+
+}
+
+void CGeneralRow::Init(IColInfoList * info)
+	//: m_col_info(info)
+	//, m_fields(NULL)
+	//, m_data(NULL)
+{
+	m_col_info = info;
 	JCASSERT(m_col_info);
 	m_col_info->AddRef();
 	m_col_num = m_col_info->GetColNum();
@@ -76,7 +88,11 @@ void CGeneralRow::GetColumnData(const CFieldDefinition *info, IValue * &val)	con
 {
 	JCASSERT(NULL == val);
 	CJCStringT tmp(m_data + m_fields[info->m_id].offset, m_fields[info->m_id].len);
-	val = static_cast<IValue*>(CTypedValue<CJCStringT>::Create(tmp) );
+	//val = static_cast<IValue*>(CTypedValue<CJCStringT>::Create(tmp) );
+
+	_CTypedValue<CJCStringT> * _val = CTypedValue<CJCStringT>::Create();
+	_val->Set(tmp);
+	val = static_cast<IValue*>(_val);
 }
 
 
@@ -99,13 +115,13 @@ void CGeneralRow::GetValueText(CJCStringT & str) const
 void CGeneralRow::SetValueText(LPCTSTR str)
 {
 	// <TODO> clear m_data
-	m_data_len = (JCSIZE)_tcslen(str);
+	m_data_len = (size_t)_tcslen(str);
 	m_data = new TCHAR[m_data_len +1];
 	_tcscpy_s(m_data, m_data_len +1, str);
 	// <TODO> calculate fields
 }
 
-int CGeneralRow::GetColumnSize() const
+size_t CGeneralRow::GetColumnSize() const
 {
 	return m_col_info->GetColNum();
 }
@@ -123,7 +139,7 @@ const CFieldDefinition * CGeneralRow::GetColumnInfo(int field) const
 // 从一个通用的行中取得通用的列数据
 void CGeneralRow::GetColumnData(int field, IValue * & val)	const
 {
-	if ((JCSIZE)field >= m_col_num) return;
+	if ((size_t)field >= m_col_num) return;
 	const CFieldDefinition * info = m_col_info->GetInfo(field);
 	GetColumnData(info, val);
 }
@@ -151,12 +167,20 @@ void CGeneralRow::FromStream(jcvos::IJCStream * str, VAL_FORMAT)
 void jcvos::CreateGeneralTable(IColInfoList * info, ITable * & table)
 {
 	JCASSERT(NULL == table);
-	table = static_cast<ITable*>(new CGeneralTable(info));
+	auto _t = CDynamicInstance<CGeneralTable>::Create();
+	_t->Init(info);
+	table = static_cast<ITable*>(_t);
 }
 
-CGeneralTable::CGeneralTable(IColInfoList * info)
-	: m_col_info(info)
+CGeneralTable::CGeneralTable(void)
+	: m_col_info(NULL)
 {
+
+}
+
+void CGeneralTable::Init(IColInfoList * info)
+{
+	m_col_info = info;
 	JCASSERT(m_col_info);
 	m_col_info->AddRef();
 }
@@ -180,8 +204,9 @@ void CGeneralTable::GetSubValue(LPCTSTR name, IValue * & val)
 
 	const CFieldDefinition * info = m_col_info->GetInfo(name);
 	if (!info) return;
-
-	val = static_cast<IValue*>(new CColumn(static_cast<ITable*>(this), info));
+	auto _v = CDynamicInstance<CColumn>::Create();
+	_v->Init(static_cast<ITable*>(this), info);
+	val = static_cast<IValue*>(_v);
 }
 
 void CGeneralTable::PushBack(IValue * val)
@@ -192,20 +217,20 @@ void CGeneralTable::PushBack(IValue * val)
 	row->AddRef();
 }
 
-void CGeneralTable::GetRow(JCSIZE index, IValue * & val)
+void CGeneralTable::GetRow(size_t index, IValue * & val)
 {
 	JCASSERT(index < m_rows.size() );
 	val = dynamic_cast<IValue*>( m_rows.at(index) );
 	if (val) val->AddRef();
 }
 
-JCSIZE CGeneralTable::GetRowSize() const
+size_t CGeneralTable::GetRowSize() const
 {
-	return (JCSIZE) m_rows.size();
+	return (size_t) m_rows.size();
 }
 
 // ITable
-JCSIZE CGeneralTable::GetColumnSize() const
+size_t CGeneralTable::GetColumnSize() const
 {
 	JCASSERT(m_col_info);
 	return m_col_info->GetColNum();

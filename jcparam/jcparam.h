@@ -7,7 +7,7 @@
 // Value可以是一个简单类型、自定义类型、或者复核类型。复核类型包括以名称索引的set和以下标索引的array。
 // Value同时提供一套从制转换到字符串的方法。转换的方法基本按照xml语法。
 #include "include/ivalue.h"
-#include "include/value.h"
+//#include "include/value.h"
 #include "include/param_define.h"
 #include "include/string_table.h"
 #include "include/table_base.h"
@@ -16,5 +16,4 @@
 #include "include/ibinary_buf.h"
 #include "include/smart_iterator.h"
 //#include "include/dynamic_table.h"
-
 #pragma comment (lib, "jcparam.lib")

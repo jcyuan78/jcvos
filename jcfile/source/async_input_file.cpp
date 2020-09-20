@@ -21,7 +21,9 @@ bool jcvos::CreateAsyncInputFile(const std::wstring & fn, CAsyncInputFile *& fil
 	JCASSERT(file == NULL);
 	try
 	{
-		file = new CAsyncInputFile(fn);
+		//file = new CAsyncInputFile(fn);
+		file = jcvos::CDynamicInstance<CAsyncInputFile>::Create();
+		file->Init(fn);
 	}
 	catch (CJCException & err)
 	{
@@ -31,8 +33,14 @@ bool jcvos::CreateAsyncInputFile(const std::wstring & fn, CAsyncInputFile *& fil
 	return br;
 }
 
-CAsyncInputFile::CAsyncInputFile(const std::wstring & fn)
-: m_ref(1), m_file(NULL), m_buffer(NULL)
+CAsyncInputFile::CAsyncInputFile(void)
+	: m_file(NULL), m_buffer(NULL)
+{
+
+}
+
+void CAsyncInputFile::Init(const std::wstring & fn)
+//: m_ref(1), m_file(NULL), m_buffer(NULL)
 {
 	LOG_STACK_TRACE();
 	memset(&m_overlap, 0, sizeof(m_overlap));
@@ -93,7 +101,7 @@ CAsyncInputFile::CAsyncInputFile(const std::wstring & fn)
 	//LOG_DEBUG(_T("event is %s"), (ir==WAIT_TIMEOUT)?_T("not signaled"):_T("not signaled") )
 	LOG_DEBUG(_T("start reading file ..."));
 	CHECK_SIGNAL(m_overlap.hEvent);
-	BOOL br=ReadFile(m_file, m_buf_entries[m_buf_tail].buf, m_buf_size, &read, &m_overlap);
+	BOOL br=ReadFile(m_file, m_buf_entries[m_buf_tail].buf, (DWORD)m_buf_size, &read, &m_overlap);
 	if (!br) LOG_WIN32_ERROR(_T("reading file"));
 	m_buf_entries[m_buf_tail].state = BS_LOADING;
 	m_buf_entries[m_buf_tail].offset = 0;
@@ -135,7 +143,7 @@ bool CAsyncInputFile::ReadLine(char * buf, size_t buf_size)
 			if (br)
 			{	// 读取完成
 				m_buffered += m_buf_size;
-				if (m_buffered >= (FILESIZE)(m_file_size.QuadPart) )
+				if (m_buffered >= m_file_size.QuadPart)
 				{
 					m_buf_entries[m_buf_tail].state = BS_LAST;
 				}
@@ -157,7 +165,7 @@ bool CAsyncInputFile::ReadLine(char * buf, size_t buf_size)
 			LOG_DEBUG(_T("buf[tail]=empty, read data"))
 			CHECK_SIGNAL(m_overlap.hEvent);
 			m_overlap.Pointer = (PVOID)(m_buffered);
-			BOOL br=ReadFile(m_file, m_buf_entries[m_buf_tail].buf, m_buf_size, &read, &m_overlap);
+			BOOL br=ReadFile(m_file, m_buf_entries[m_buf_tail].buf, (DWORD)m_buf_size, &read, &m_overlap);
 			//if (!br) LOG_WIN32_ERROR(_T("reading file"));
 			m_buf_entries[m_buf_tail].state = BS_LOADING;
 			m_buf_entries[m_buf_tail].offset = m_buffered;

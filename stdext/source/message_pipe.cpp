@@ -1,5 +1,6 @@
 #include "../include/message_pipe.h"
 #include "../include/jcexception.h"
+#include <boost/cast.hpp>
 
 // {02818A64-46C3-4487-99D6-A8850139B4B5}
 const GUID jcvos::CMessagePipe::m_guid = 
@@ -31,7 +32,8 @@ void jcvos::CMessagePipe::WriteMessage(const wchar_t * msg, size_t msg_len)
 	EnterCriticalSection(&m_write_critical);
 	JCASSERT(m_write_pipe);
 	DWORD written=0;
-	BOOL br=WriteFile(m_write_pipe, msg, sizeof(wchar_t) * msg_len, &written, NULL);
+	BOOL br=WriteFile(m_write_pipe, msg, 
+		boost::numeric_cast<DWORD>(sizeof(wchar_t) * msg_len), &written, NULL);
 	if (!br)
 	{
 		LeaveCriticalSection(&m_write_critical);
@@ -79,6 +81,6 @@ size_t jcvos::CMessagePipe::ReadMessage(wchar_t * msg, size_t buf_len)
 }
 
 //#ifdef USE_TEMPLAE_SINGLETONE
-//template class CGlobalSingleTone<jcvos::CMessagePipe>;
+//template class CGlobalSingleTon<jcvos::CMessagePipe>;
 //#endif
 

@@ -17,6 +17,9 @@ public:
 	virtual BYTE * Lock(void) {return (BYTE*)m_data;};
 	virtual void Unlock(void * ptr) {};
 	virtual size_t GetSize(void) const {return m_len;};
+	//virtual void CopyTo(IBinaryBuffer * & buf);
+
+	friend bool jcvos::DuplicateBuffer(jcvos::IBinaryBuffer * & dst, jcvos::IBinaryBuffer * src);
 
 public:
 	void SetDataSize(size_t l) {m_len = l;};
@@ -56,19 +59,14 @@ bool jcvos::LoadBinaryFromFile(jcvos::IBinaryBuffer * & buf, const std::wstring 
 #endif
 	JCASSERT(buf==0);
 	jcvos::auto_handle<FILE*>	ff(NULL);
-	//FILE * ff = NULL;
 	_wfopen_s(&ff, fn.c_str(), _T("r+b"));
-	//if (!ff)	ERROR_TERM_(return false, _T("[err] failed on open file %s"), fn.c_str());
 	if (!ff) THROW_ERROR(ERR_PARAMETER, L"[err] failed on open file %s", fn.c_str());
 
 	// 获取文件长度
 	fseek(ff, 0, SEEK_END);
 	long fsize = ftell(ff);
 	if (fsize<=0)	THROW_ERROR(ERR_PARAMETER, L"[err] file size is 0")
-	//{
-	//	LOG_ERROR(_T("[err] file size is 0"))
-	//	return false;
-	//}
+
 	fseek(ff, 0, SEEK_SET);
 	
 	CBinaryBuffer * _buf=static_cast<CBinaryBuffer*>(new jcvos::CDynamicInstance<CBinaryBuffer> );
@@ -99,6 +97,19 @@ bool jcvos::SaveBinaryToFile(jcvos::IBinaryBuffer * & buf, const std::wstring & 
 	bool br=SaveBinaryToFile(data, ss, fn);
 	buf->Unlock(data);
 	return br;
+}
+
+bool jcvos::DuplicateBuffer(jcvos::IBinaryBuffer * & dst, jcvos::IBinaryBuffer * src)
+{
+	JCASSERT(dst == NULL);
+	CBinaryBuffer *_buf = jcvos::CDynamicInstance<CBinaryBuffer>::Create();
+	size_t len = src->GetSize();
+	_buf->CreateBuffer(len);
+	BYTE * _src = src->Lock();
+	memcpy_s(_buf->m_data, _buf->m_len, _src, len);
+	dst = static_cast<jcvos::IBinaryBuffer*>(_buf);
+	src->Unlock(_src);
+	return true;
 }
 
 CBinaryBuffer::CBinaryBuffer(void)

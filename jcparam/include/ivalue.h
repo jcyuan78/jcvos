@@ -87,7 +87,7 @@ namespace jcvos
 	class CFieldDefinition
 	{
 	public:
-		CFieldDefinition(JCSIZE offset, JCSIZE size, LPCTSTR name)
+		CFieldDefinition(size_t offset, size_t size, LPCTSTR name)
 			: m_id(0), m_offset(offset),
 			m_name(name), m_size(size)
 		{};
@@ -108,9 +108,9 @@ namespace jcvos
 		{ return (reinterpret_cast<T*>((BYTE*)row + m_offset)); }
 
 	public:
-		JCSIZE		m_id;
-		JCSIZE		m_offset;
-		JCSIZE		m_size;
+		size_t		m_id;
+		size_t		m_offset;
+		size_t		m_size;
 		CJCStringT	m_name;
 	};
 
@@ -119,8 +119,8 @@ namespace jcvos
 	public:
 		virtual void AddInfo(const CFieldDefinition* info) = 0;
 		virtual const CFieldDefinition * GetInfo(const CJCStringT & key) const = 0;
-		virtual const CFieldDefinition * GetInfo(JCSIZE index) const = 0;
-		virtual JCSIZE GetColNum(void) const =0;
+		virtual const CFieldDefinition * GetInfo(size_t index) const = 0;
+		virtual size_t GetColNum(void) const =0;
 		virtual void OutputHead(IJCStream * stream) const = 0;
 	};
 
@@ -128,22 +128,22 @@ namespace jcvos
 	{
 	public:
 		virtual void PushBack(IValue * val) = 0;
-		virtual void GetRow(JCSIZE index, IValue * & val) = 0;
-		virtual JCSIZE GetRowSize() const = 0;
+		virtual void GetRow(size_t index, IValue * & val) = 0;
+		virtual size_t GetRowSize() const = 0;
 	};
 
 	class ITable : virtual public IVector, virtual public IVisibleValue
 	{
 		// for column access
 	public:
-		virtual JCSIZE GetColumnSize() const = 0;
+		virtual size_t GetColumnSize() const = 0;
 	};
 
 	class ITableRow : public IVisibleValue
 	{
 		// for column(field) access
 	public:
-		virtual int GetColumnSize() const = 0;
+		virtual size_t GetColumnSize() const = 0;
 		virtual const CFieldDefinition * GetColumnInfo(LPCTSTR field_name) const = 0;
 		virtual const CFieldDefinition * GetColumnInfo(int field) const = 0;
 		// 从一个通用的行中取得通用的列数据

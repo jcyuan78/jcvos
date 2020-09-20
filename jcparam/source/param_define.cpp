@@ -10,20 +10,23 @@ using namespace jcvos;
 
 ///////////////////////////////////////////////////////////////////////////////
 //-- CArguSet
-bool CArguSet::GetCommand(JCSIZE index, CJCStringT & str_cmd)
+bool CArguSet::GetCommand(size_t index, std::wstring & str_cmd)
 {
+	wchar_t name[8];
+	swprintf_s(name, L"#%02zd", index);
 	jcvos::auto_interface<IValue> cmd;
-	bool br = GetCommand(index, cmd);
-	if ( !br ) return false;
+	GetSubValue(name, cmd);
+//	bool br = GetCommand(index, cmd);
+	if ( !cmd ) return false;
 	cmd->GetValueText(str_cmd);
 	return true;
 }
 
-bool CArguSet::GetCommand(JCSIZE index, IValue * & val)
+bool CArguSet::GetCommand(size_t index, IValue * & val)
 {
 	JCASSERT(NULL == val);
 	CJCStringT param_name;
-	CConvertor<int>::T2S(index, param_name);
+	CConvertor<size_t>::T2S(index, param_name);
 	GetSubValue(param_name.c_str(), val);
 	return (val != NULL);
 }
@@ -192,33 +195,6 @@ bool CArguDefList::InitializeArguments(BYTE * base)
 	return true;
 }
 
-/*
-bool CArguDefList::Parse(LPCTSTR cmd, BYTE * base)
-{
-//	qi::rule param_rule_1 = qi::lexeme[L"-"] >> qi::lexeme[nc::char_] >> (*qi::lexeme[nc::char_]);
-	const wchar_t * first = cmd;
-	const wchar_t * last = first + wcslen(cmd);
-
-	typedef boost::fusion::vector<wchar_t, std::wstring> param_type1;
-	typedef boost::variant<std::wstring, param_type1> param_type0;
-
-	//param_type0 res1;
-	boost::fusion::vector< std::vector<param_type0> >res1;
-	bool br = qi::phrase_parse( first, last, 
-		*( (*qi::lexeme[nc::char_]) | 
-		(qi::lexeme[L"-"] >> qi::lexeme[nc::char_] >> (*qi::lexeme[nc::char_])) )
-		, nc::space, res1);
-
-	//std::vector<param_type0>::iterator it;
-	//for (it = res1.begin(); it!=res1.end(); ++it)
-	//{
-	//	std::wstring rr1=boost::get<std::wstring>(*it);
-	//	param_type1 rr2=boost::get<param_type1>(*it);
-	//}
-	return br;
-}
-*/
-
 bool GetQuotation(const wchar_t * & cmd, wchar_t * & buf)
 {
 	cmd ++;	// skip "
@@ -263,13 +239,11 @@ bool GetToken(const wchar_t * & cmd, wchar_t * buf)
 	*buf=0;
 	return true;
 }
-
 bool CArguDefList::Parse(LPCTSTR cmd, BYTE * base) 
 {
 	wchar_t buf[512];
 	const wchar_t * _cmd = cmd;
 	m_command_index = 0;
-
 
 	bool br = GetToken(_cmd, buf);
 	while (br)
@@ -295,12 +269,6 @@ bool CArguDefList::Parse(LPCTSTR cmd, BYTE * base)
 				const CArguDescBase * arg_desc = GetParamDef(*token);	token++;
 				if (!arg_desc) THROW_ERROR(ERR_ARGUMENT, 
 					_T("Unknow abbreviate option: -%c at %s"), (wchar_t)(*token), buf);
-				//if (jcvos::VT_BOOL == arg_desc->mValueType)
-				//{
-				//	if (*token != 0) THROW_ERROR(ERR_ARGUMENT, L"Wrong parameter %s", buf);
-				//	OnToken(arg_desc->mName, L"true", base);
-				//}
-
 				if (*token == 0)
 				{	// need value
 					br = GetToken(_cmd, buf);	token=buf;
@@ -323,147 +291,10 @@ bool CArguDefList::Parse(LPCTSTR cmd, BYTE * base)
 			OnToken(_name, token, base);
 			br = GetToken(_cmd, buf);
 		}
-	};
+	}
 	return true;
 }
 
-
-
-/*
-bool CArguDefList::Parse(LPCTSTR cmd, BYTE * base) 
-{
-	m_command_index = 0;
-	if (NULL == cmd || 0 == *cmd ) return true;
-	enum STATUS
-	{
-		WHITE_SPACE,
-		PARAM_WORD,
-		QUOTATION,
-	};
-
-	STATUS ss=WHITE_SPACE;
-	LPCTSTR str = cmd, start = NULL;
-	CJCStringT token;
-	do
-	{
-		switch (ss)
-		{
-		case WHITE_SPACE:
-			if ( _tcschr(_T(" \t\r\n"), *str) == 0)
-			{
-				// not white space
-				start = str;
-				if ( _T('\"') == *str )	++ start, ss = QUOTATION;	// skip "
-				else						ss = PARAM_WORD;
-			}
-			break;
-
-		case PARAM_WORD:
-			if ( _T('\"') == *str )
-			{
-				// copy current string and skie "
-				if ( start && str > start)		token += CJCStringT(start, 0, (str - start));
-				start = str+1;
-				ss = QUOTATION;
-			}
-			else if ( (0 == *str) || _tcschr(_T(" \t\r\n"), *str) != 0)
-			{
-				// end of token
-				if (start && str > start)		token += CJCStringT(start, 0, (str - start));
-				ParseToken(token.c_str(), 0, base);
-				token.clear();
-				ss = WHITE_SPACE;
-			}
-			break;
-
-		case QUOTATION:
-			if ( 0 == *str) THROW_ERROR(ERR_ARGUMENT, _T("Missing close quotator") );
-			if ( _T('\"') == *str )
-			{
-				// end of quotation
-				if (start && str > start) 	token += CJCStringT(start, 0, (str - start));
-				start = str+1;
-				ss = PARAM_WORD;
-			}
-			break;
-		}
-		if (0 == * str) break;
-		++str;
-	}
-	while (1);
-	return true;
-}
-*/
-
-
-// 根据Defination的指示，如果base!=NULL，并且arg_def的offset！=0，
-//	将parse到的argument填入base结构中。无法填入的argument填入argset中
-/*
-bool CArguDefList::ParseToken(LPCTSTR token, JCSIZE len, BYTE * base)
-{
-	//			如果有，这是一个以全名定义的parameter
-	//			否则，这是一个以全名定义的swich
-	//		否则，检查第二个字符的描述
-	//			swich：检查下一个描述
-	//			parameter：处理参数
-	//	否则，这是一个command
-
-	CJCStringT param_name;
-	LPCTSTR arg = token;
-	const CArguDescBase * arg_desc = NULL;
-
-	// 检查第一个字符，
-	if (_T('-') == arg[0])
-	{
-		//	如果是'-'，检查第二个字符
-		if (_T('-') == arg[1])
-		{
-			//		如果是'-'，检查是否有等号存在
-			LPCTSTR dev = _tcschr(arg, _T('='));
-			JCSIZE len = 0;
-			LPCTSTR str_val = NULL;
-			if (dev)	len = (JCSIZE)((dev - arg)-2), str_val = dev+1;
-			else		len = (JCSIZE)(_tcslen(arg)-2);
-
-			if (!len)	THROW_ERROR(ERR_ARGUMENT, _T("Uncorrect argument %s."), arg);
-			param_name = CJCStringT(arg+2, 0, len);
-			OnToken(param_name, str_val, base);
-		}
-		else
-		{
-			++arg;
-			LPCTSTR org = arg;
-			while (*arg)
-			{
-				const CArguDescBase * arg_desc = GetParamDef(*arg);
-				if (!arg_desc) THROW_ERROR(ERR_ARGUMENT, 
-					_T("Unknow abbreviate option: -%c at %s"), (char)(*arg), org);
-
-				++arg;
-				if (jcvos::VT_BOOL == arg_desc->mValueType)
-				{
-					OnToken(arg_desc->mName, _T("true"), base);
-				}
-				else
-				{
-					// trim left spaces
-					while ( (*arg) && IsSpace(*arg) ) arg++;
-					if (*arg) OnToken(arg_desc->mName, arg, base);
-					break;
-				}
-			}
-		}
-	}
-	else
-	{
-		// No name parameter
-		TCHAR _name[16];
-		jcvos::jc_sprintf(_name, _T("#%02d"), m_command_index);
-		OnToken(_name, arg, base);
-	}
-	return false;
-}
-*/
 
 bool CArguDefList::OnToken(const CJCStringT & argu_name, LPCTSTR argu_val, BYTE * base)
 {
@@ -472,13 +303,23 @@ bool CArguDefList::OnToken(const CJCStringT & argu_name, LPCTSTR argu_val, BYTE 
 	if ( it == m_param_map->end() )
 	{
 		if ( m_properties & PROP_MATCH_PARAM_NAME)	THROW_ERROR(ERR_ARGUMENT, _T("unknown argument name &s."), argu_name)
-		else	pval = static_cast<IValue*>(CTypedValue<CJCStringT>::Create(argu_val));
+		else 
+		{
+			_CTypedValue<CJCStringT> * _val = CTypedValue<CJCStringT>::Create();
+			_val->Set(argu_val);
+			pval = static_cast<IValue*>(_val);
+		}
 	}
 	else
 	{
 		const CArguDescBase * argu_def = it->second;
 		if (base && argu_def->m_offset > 0)	argu_def->SetValue(base, argu_val);
-		else	pval = static_cast<IValue*>(CTypedValue<CJCStringT>::Create(argu_val));
+		else 
+		{
+			_CTypedValue<CJCStringT> * _val = CTypedValue<CJCStringT>::Create();
+			_val->Set(argu_val);
+			pval = static_cast<IValue*>(_val);
+		}
 	}
 
 	if (pval)

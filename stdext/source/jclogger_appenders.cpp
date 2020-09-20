@@ -5,6 +5,7 @@
 
 #include "jclogger_appenders.h"
 #include "../local_config.h"
+#include <boost/cast.hpp>
 
 using namespace jclogger;
 
@@ -79,7 +80,7 @@ FileAppender::~FileAppender(void)
 	delete [] m_str_buf;
 }
 
-void FileAppender::WriteString(LPCTSTR str, JCSIZE len)
+void FileAppender::WriteString(LPCTSTR str, size_t len)
 {
 	DWORD written = 0;
 	BOOL br = FALSE;
@@ -89,7 +90,7 @@ void FileAppender::WriteString(LPCTSTR str, JCSIZE len)
 	if (m_mode_sync)
 	{	// 同步输出，等待写文件返回，进程同步
 		SetFilePointer(m_file, 0, 0, FILE_END);
-		br = WriteFile(m_file, (LPCVOID) str, len * sizeof(TCHAR), &written, NULL); 
+		br = WriteFile(m_file, (LPCVOID) str, boost::numeric_cast<DWORD>(len * sizeof(TCHAR)), &written, NULL); 
 		FlushFileBuffers(m_file);
 		SetEvent(m_overlap.hEvent);
 	}
@@ -110,7 +111,7 @@ void FileAppender::WriteString(LPCTSTR str, JCSIZE len)
 		m_file_size += (len * sizeof(TCHAR));
 #endif
 		_tcscpy_s(m_str_buf, LOGGER_MSG_BUF_SIZE, str);
-		br = WriteFile(m_file, (LPCVOID) m_str_buf, len * sizeof(TCHAR), NULL, &m_overlap); 
+		br = WriteFile(m_file, (LPCVOID) m_str_buf, boost::numeric_cast<DWORD>(len * sizeof(TCHAR)), NULL, &m_overlap); 
 	}
 }
 
@@ -151,7 +152,7 @@ void FileAppender::Flush()
 
 ///////////////////////////////////////////////////////////////////////////////
 // stderr ----------------------------------------------------------------------
-//void CStdErrApd::WriteString(LPCTSTR str, JCSIZE len)
+//void CStdErrApd::WriteString(LPCTSTR str, size_t len)
 //{
 //	printf_s("%S\r", str);
 //}
@@ -178,7 +179,7 @@ CDebugAppender::~CDebugAppender(void)
 }
 
 
-void CDebugAppender::WriteString(LPCTSTR str, JCSIZE)
+void CDebugAppender::WriteString(LPCTSTR str, size_t)
 {
 
 	OutputDebugString(str);

@@ -85,7 +85,6 @@ bool CFileMappingBuf::ConnectToFileByte(jcvos::IFileMapping * mapping, FILESIZE 
 	m_mapping = mapping;
 	m_mapping->AddRef();
 	FILESIZE start = offset;
-	JCASSERT(len <= UINT_MAX);
 	m_length = (size_t)len;
 	m_aligned_start = jcvos::AligneLo(start);		JCASSERT(m_aligned_start <= start);
 	m_offset = (size_t)(start - m_aligned_start);

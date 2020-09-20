@@ -21,7 +21,7 @@ void LogVirtualMapping(const CJCStringT & fn, DWORD page_size)
 	fprintf_s(file, "add, size, status, type\n");
 	for (ULONG ii = 0; ii < 0x80000000; )
 	{
-		JCSIZE ir = VirtualQuery((LPVOID)ii, &mbi, sizeof(mbi));
+		size_t ir = VirtualQuery((LPVOID)ii, &mbi, sizeof(mbi));
 		if (ir)
 		{
 			fprintf_s(file, "%08X, %d, %X, %X\n", ii, mbi.RegionSize, mbi.State, mbi.Type);
@@ -62,52 +62,52 @@ void LogVirtualMapping(const CJCStringT & fn, DWORD page_size)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-//-- CSingleToneContainer
+//-- CSingleTonContainer
 //     用于存储signle tone entry和single tone instance。整个Process唯一。
 
 #define	MAX_ENTRY		64
 // 容纳Single Tone对象的数量，必须是2的整次幂
 #define MAX_INSTANCE	256
 
-class CSingleToneContainer
+class CSingleTonContainer
 {
 public:
 	GUID				m_signature;
 	// 用于保护entry list
 	CRITICAL_SECTION	m_critical;
-	JCSIZE				m_entry_count;
-	CSingleToneEntry *	m_entry_list[MAX_ENTRY];
-	CSingleToneBase *	m_instance[MAX_INSTANCE];
+	size_t				m_entry_count;
+	CSingleTonEntry *	m_entry_list[MAX_ENTRY];
+	jcvos::CSingleTonBase *	m_instance[MAX_INSTANCE];
 	// 记录instance[i]是由哪个模块创建的，在模块unregister时，release instance。
 	// 通过两个并行数组，为了使每个元素的地址对齐。
 	BYTE				m_instance_entry[MAX_INSTANCE];
 
 #ifdef _DEBUG
 	// 用于HASH碰撞测试
-	JCSIZE m_hash_conflict;
-	JCSIZE m_total_instance;
+	size_t m_hash_conflict;
+	size_t m_total_instance;
 #endif
 
 private:
-	CSingleToneContainer(void) {};
-	~CSingleToneContainer(void) {};
+	CSingleTonContainer(void) {};
+	~CSingleTonContainer(void) {};
 
 public:
 	static bool IsSingleToneManager(LPVOID ptr);
-	void Initialize(JCSIZE size, CSingleToneEntry * ptr);
+	void Initialize(size_t size, CSingleTonEntry * ptr);
 	void CleanUp(void);
-	bool RegisterEntry(CSingleToneEntry* entry, UINT &id);
+	bool RegisterEntry(CSingleTonEntry* entry, UINT &id);
 	// 返回剩余entry的个数，如果为0，则执行清除工作
-	UINT UnRegisterEntry(UINT);
-	bool RegisterStInstance(const GUID & guid, CSingleToneBase * obj, UINT entry_id);
-	bool QueryStInstance(const GUID & guid, CSingleToneBase * & obj);
+	size_t UnRegisterEntry(UINT);
+	bool RegisterStInstance(const GUID & guid, jcvos::CSingleTonBase * obj, UINT entry_id);
+	bool QueryStInstance(const GUID & guid, jcvos::CSingleTonBase * & obj);
 	WORD CalculateHash(const GUID & guid);
 };
 
 
-bool CSingleToneContainer::IsSingleToneManager(LPVOID ptr)
+bool CSingleTonContainer::IsSingleToneManager(LPVOID ptr)
 {
-	CSingleToneContainer * base = (CSingleToneContainer *)(ptr);
+	CSingleTonContainer * base = (CSingleTonContainer *)(ptr);
 	if (!base)
 	{
 		_LOG_(_T("pointer of CStingleToneManager is NULL\n"));
@@ -116,7 +116,7 @@ bool CSingleToneContainer::IsSingleToneManager(LPVOID ptr)
 	return IsEqualGUID(base->m_signature, SINGLE_TONE_GUID) != 0;
 }
 
-void CSingleToneContainer::Initialize(JCSIZE size, CSingleToneEntry * entry)
+void CSingleTonContainer::Initialize(size_t size, CSingleTonEntry * entry)
 {
 	memset(this, 0, size);
 	memcpy_s(&m_signature, sizeof(GUID), &SINGLE_TONE_GUID, sizeof(GUID));
@@ -133,7 +133,7 @@ void CSingleToneContainer::Initialize(JCSIZE size, CSingleToneEntry * entry)
 	LeaveCriticalSection(&m_critical);
 }
 
-bool CSingleToneContainer::RegisterEntry(CSingleToneEntry* entry, UINT &id)
+bool CSingleTonContainer::RegisterEntry(CSingleTonEntry* entry, UINT &id)
 {
 	if (m_entry_count >= MAX_ENTRY) return false;
 	EnterCriticalSection(&m_critical);
@@ -148,10 +148,10 @@ bool CSingleToneContainer::RegisterEntry(CSingleToneEntry* entry, UINT &id)
 	return true;
 }
 
-UINT CSingleToneContainer::UnRegisterEntry(UINT entry_id)
+size_t CSingleTonContainer::UnRegisterEntry(UINT entry_id)
 {
 	_LOG_(_T("unregister st entry %d\n"), entry_id);
-	UINT remain = 0;
+	size_t remain = 0;
 	if (entry_id >= MAX_ENTRY) return false;
 	EnterCriticalSection(&m_critical);
 	// 销毁entry创建的single tone对象
@@ -175,7 +175,7 @@ UINT CSingleToneContainer::UnRegisterEntry(UINT entry_id)
 	return remain;
 }
 
-WORD CSingleToneContainer::CalculateHash(const GUID & guid)
+WORD CSingleTonContainer::CalculateHash(const GUID & guid)
 {
 	static const int num = sizeof(GUID) / sizeof (WORD);
 	const WORD *buf = reinterpret_cast<const WORD*>(&guid);
@@ -184,8 +184,8 @@ WORD CSingleToneContainer::CalculateHash(const GUID & guid)
 	return hash;
 }
 
-bool CSingleToneContainer::RegisterStInstance(
-		const GUID & guid, CSingleToneBase * obj, UINT entry_id)
+bool CSingleTonContainer::RegisterStInstance(
+		const GUID & guid, jcvos::CSingleTonBase * obj, UINT entry_id)
 {
 	// 采用Hash表，哈希算法：将GUID的各位（2字节）相加，去最低9位（512元素）。
 	//  如果Hash值碰撞，则顺序向后搜索。
@@ -217,7 +217,7 @@ bool CSingleToneContainer::RegisterStInstance(
 	return br;
 }
 
-bool CSingleToneContainer::QueryStInstance(const GUID & guid, CSingleToneBase * & obj)
+bool CSingleTonContainer::QueryStInstance(const GUID & guid, jcvos::CSingleTonBase * & obj)
 {
 	WORD hash = CalculateHash(guid);
 	hash &= (MAX_INSTANCE-1);
@@ -243,11 +243,11 @@ bool CSingleToneContainer::QueryStInstance(const GUID & guid, CSingleToneBase * 
 	return br;
 }
 
-void CSingleToneContainer::CleanUp(void)
+void CSingleTonContainer::CleanUp(void)
 {
 	_LOG_(_T("clean up st manager\n"));
 #ifdef _DEBUG
-	_LOG_(_T("total hash registered: %d, conflicted: %d\n"), m_total_instance, m_hash_conflict)
+	_LOG_(L"total hash registered: %zd, conflicted: %zd\n", m_total_instance, m_hash_conflict)
 #endif
 	EnterCriticalSection(&m_critical);
 	UINT ii = 0;
@@ -257,8 +257,10 @@ void CSingleToneContainer::CleanUp(void)
 	{
 		if (m_instance[ii] || m_instance_entry[ii] != 0xFF)
 		{
-			_LOG_(_T("[single tone error] instance remained, hash=%X, add=%08X, entry=%d\n"), 
-				ii, reinterpret_cast<UINT32>(m_instance[ii]), m_instance_entry[ii])
+			//_LOG_(_T("[single tone error] instance remained, hash=%X, add=%, entry=%d\n"), 
+			//	ii, reinterpret_cast<UINT32>(m_instance[ii]), m_instance_entry[ii])
+			_LOG_(L"[single tone error] instance remained, hash=%X, add=%p, entry=%d\n", 
+				ii, m_instance[ii], m_instance_entry[ii])
 		}
 
 	}
@@ -268,19 +270,20 @@ void CSingleToneContainer::CleanUp(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//-- CSingleToneEntry
-CSingleToneEntry::CSingleToneEntry(void)
+//-- CSingleTonEntry
+CSingleTonEntry::CSingleTonEntry(void)
 : m_base(NULL), m_entry_id(UINT_MAX)
 {
-	_LOG_(_T("StEntry this = 0x%08X\n"), (UINT)this);
-	_LOG_(_T("sizeof(CRITICAL_SECTION) = %d\n"), sizeof(CRITICAL_SECTION));
+	//_LOG_(_T("StEntry this = 0x%08X\n"), (UINT)this);
+	_LOG_(L"StEntry this = 0x%p\n", this);
+	_LOG_(L"sizeof(CRITICAL_SECTION) = %zd\n", sizeof(CRITICAL_SECTION));
 
 	// 取得系统Page大小
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
 	DWORD page_size = si.dwPageSize;
-	if (sizeof(CSingleToneContainer) >= page_size) _FATAL_(
-		_T("CSingleToneContainer (%d) is large than page size (%d)"), sizeof(CSingleToneContainer), page_size)
+	if (sizeof(CSingleTonContainer) >= page_size) _FATAL_(
+		_T("CSingleTonContainer (%zd) is large than page size (%d)"), sizeof(CSingleTonContainer), page_size)
 
 	LogVirtualMapping(_T("virtal_mapping_01.txt"), page_size);
 
@@ -291,14 +294,14 @@ CSingleToneEntry::CSingleToneEntry(void)
 	LPVOID ptr = si.lpMinimumApplicationAddress;
 	for ( ; ptr < si.lpMaximumApplicationAddress; )
 	{
-		JCSIZE ir = VirtualQuery(ptr, &mbi, sizeof(mbi));
+		size_t ir = VirtualQuery(ptr, &mbi, sizeof(mbi));
 		if (ir == 0)	_FATAL_(_T("fatal error: VirtualQuery failed\n"));
 		if ( (mbi.State & MEM_COMMIT) && (mbi.Protect == PAGE_READWRITE)
 			&& (mbi.Type == MEM_PRIVATE)
-			&& CSingleToneContainer::IsSingleToneManager(ptr) )
+			&& CSingleTonContainer::IsSingleToneManager(ptr) )
 		{
 			_LOG_(_T("found signature at add = 0x%08X\n"), (ULONG32)ptr);
-			m_base = reinterpret_cast<CSingleToneContainer*>(ptr);
+			m_base = reinterpret_cast<CSingleTonContainer*>(ptr);
 			bool br = m_base->RegisterEntry(this, m_entry_id);
 			if (!br) _FATAL_(_T("entry of single tone manager is full\n"))
 			break;
@@ -307,7 +310,7 @@ CSingleToneEntry::CSingleToneEntry(void)
 	}
 	if (m_base == NULL)
 	{
-		m_base = (CSingleToneContainer*)(VirtualAlloc(NULL, page_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
+		m_base = (CSingleTonContainer*)(VirtualAlloc(NULL, page_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
 		if (m_base == NULL)	_FATAL_(_T("allocate virtual page failed. error = %d\n"), GetLastError() );
 		_LOG_(_T("allocated new virtual page at add = 0x%08X\n"), m_base);
 		m_entry_id = 0;
@@ -334,10 +337,10 @@ CSingleToneEntry::CSingleToneEntry(void)
 		_LOG_(_T("found var at add = %s, checking sig... \n"), str_ptr);
 		UINT64 ptr=NULL;
 		_stscanf_s(str_ptr, _T("%I64X"), &ptr);
-		if (CSingleToneContainer::IsSingleToneManager((LPVOID)ptr))
+		if (CSingleTonContainer::IsSingleToneManager((LPVOID)ptr))
 		{
 			_LOG_(L"confirmed signature \n");
-			m_base = reinterpret_cast<CSingleToneContainer*>(ptr);
+			m_base = reinterpret_cast<CSingleTonContainer*>(ptr);
 			bool br = m_base->RegisterEntry(this, m_entry_id);
 			if (!br) _FATAL_(_T("entry of single tone manager is full\n"))
 		}
@@ -345,7 +348,7 @@ CSingleToneEntry::CSingleToneEntry(void)
 	}
 	else
 	{
-		m_base = (CSingleToneContainer*)(VirtualAlloc(NULL, page_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
+		m_base = (CSingleTonContainer*)(VirtualAlloc(NULL, page_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
 		if (m_base == NULL)	_FATAL_(_T("allocate virtual page failed. error = %d\n"), GetLastError() );
 		// save it
 		_stprintf_s(str_ptr, _T("%016I64X"), (UINT64)m_base);
@@ -359,10 +362,11 @@ CSingleToneEntry::CSingleToneEntry(void)
 #endif
 }
 
-CSingleToneEntry::~CSingleToneEntry(void)
+CSingleTonEntry::~CSingleTonEntry(void)
 {
-	_LOG_(_T("distruct StEntry this = 0x%08X\n"), (UINT)this);
-	UINT remain = UINT_MAX;
+//	_LOG_(_T("distruct StEntry this = 0x%08X\n"), (UINT)this);
+	_LOG_(L"distruct StEntry this = 0x%p\n", this);
+	size_t remain = SIZE_MAX;
 	if (m_base) remain = m_base->UnRegisterEntry(m_entry_id);
 	if (remain == 0)
 	{
@@ -370,18 +374,18 @@ CSingleToneEntry::~CSingleToneEntry(void)
 	}
 }
 
-CSingleToneEntry * CSingleToneEntry::Instance(void)
+CSingleTonEntry * CSingleTonEntry::Instance(void)
 {
-	static CSingleToneEntry _single_tone_container;
+	static CSingleTonEntry _single_tone_container;
 	return & _single_tone_container;
 }
 
-bool CSingleToneEntry::QueryStInstance(const GUID & guid, CSingleToneBase * & obj)
+bool CSingleTonEntry::QueryStInstance(const GUID & guid, jcvos::CSingleTonBase * & obj)
 {
 	return m_base->QueryStInstance(guid, obj);
 }
 
-bool CSingleToneEntry::RegisterStInstance(const GUID & guid, CSingleToneBase * obj)
+bool CSingleTonEntry::RegisterStInstance(const GUID & guid, jcvos::CSingleTonBase * obj)
 {
 	return m_base->RegisterStInstance(guid, obj, m_entry_id);
 }

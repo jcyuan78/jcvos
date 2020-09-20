@@ -37,7 +37,7 @@ public:
 
 	// len: legnth of str, in BYTE
 	virtual ~CJCLoggerAppender() {};
-    virtual void WriteString(LPCTSTR str, JCSIZE len) = 0;
+    virtual void WriteString(LPCTSTR str, size_t len) = 0;
     virtual void Flush() = 0;
 };
 
@@ -49,15 +49,15 @@ class CJCLoggerNode;
 // -- 统计函数的被叫次数和总时间
 struct CJCFunctionDuration
 {
-	CJCFunctionDuration(const CJCStringT & func) : m_func_name(func), m_duration(0), m_calls(0) {}
-	CJCStringT m_func_name;
+	CJCFunctionDuration(const std::wstring & func) : m_func_name(func), m_duration(0), m_calls(0) {}
+	std::wstring m_func_name;
 	LONGLONG m_duration;	// 总的累积执行时间
 	UINT m_calls;			// 被叫次数
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 //-- CJCLogger
-class CJCLoggerLocal : public CSingleToneBase
+class CJCLoggerLocal : public jcvos::CSingleTonBase
 {
 public:
 	enum COLUMN_SELECT
@@ -77,14 +77,14 @@ public:
 	};
 
 public:
-    typedef std::map<CJCStringW, CJCLoggerNode*> LoggerCategoryMap;
+    typedef std::map<std::wstring, CJCLoggerNode*> LoggerCategoryMap;
     CJCLoggerLocal(CJCLoggerAppender * appender = NULL);
     /*virtual*/ ~CJCLoggerLocal(void);
 
 
     bool RegisterLoggerNode(CJCLoggerNode * node);
     bool UnregisterLoggerNode(CJCLoggerNode * node);
-    void WriteString(LPCTSTR str, JCSIZE len);
+    void WriteString(LPCTSTR str, size_t len);
 	DWORD GetColumnSelect(void) const	{return m_column_select;}
 	void SetColumnSelect(DWORD sel)		{ m_column_select = sel; }
 	void SetProperty(DWORD prop)		{ m_prop = prop; }
@@ -102,8 +102,8 @@ public:
 
 	// 由于std::map对方法敏感，这里设置virtual，静态模块的所有实例都通过CJCLogger
 	//  Single Tone对象指针的虚表调用，确保调用的是同一个函数实例。
-    virtual CJCLoggerNode * EnableCategory(const CJCStringT & name, int level);
-    CJCLoggerNode * GetLogger(const CJCStringT & name);
+    virtual CJCLoggerNode * EnableCategory(const std::wstring & name, int level);
+    CJCLoggerNode * GetLogger(const std::wstring & name);
 
 	static const GUID & Guid(void) {return m_guid;};
 
@@ -124,10 +124,10 @@ protected:
 
 	// 用于统计函数的执行次数和总时间。
 public:
-	void RegistFunction(const CJCStringT & func_name, LONGLONG duration);
+	void RegistFunction(const std::wstring & func_name, LONGLONG duration);
 protected:
 	void OutputFunctionDuration(void);
-	typedef std::map<CJCStringT, CJCFunctionDuration>	DURATION_MAP;
+	typedef std::map<std::wstring, CJCFunctionDuration>	DURATION_MAP;
 	DURATION_MAP	m_duration_map;
 
 	static const GUID m_guid;
@@ -142,7 +142,7 @@ public:
 	{
 #if LOG_SINGLE_TONE_SUPPORT > 0
 		static CJCLoggerLocal* instance = NULL;
-		if (instance == NULL)	CSingleToneEntry::GetInstance<CJCLoggerLocal >(instance);
+		if (instance == NULL)	CSingleTonEntry::GetInstance<CJCLoggerLocal >(instance);
 		return instance;
 #else
 		static CJCLoggerLocal instance;
@@ -153,16 +153,9 @@ public:
 
 typedef CJCLoggerLocal CJCLogger;
 
-//	在PowerShell的Cmdlet中，如果CJCLogger的SingleTone对象从CGlobalSingleTone继承，
-//	当CSingleToneEntry注销时，调用CGlobalSingleTone的Release的delete this是会出错，
-//	错误原因不明，可能是堆栈溢出。改成CJCLoggerLocal直接继承CSingleToneBase就没有错误。
-
-//#if LOG_SINGLE_TONE_SUPPORT > 0
-//typedef CGlobalSingleTone<CJCLoggerLocal>		CJCLogger;
-//#else
-//typedef CLocalSingleTone<CJCLoggerLocal>		CJCLogger;
-//#endif
-
+//	在PowerShell的Cmdlet中，如果CJCLogger的SingleTone对象从CGlobalSingleTon继承，
+//	当CSingleTonEntry注销时，调用CGlobalSingleTon的Release的delete this是会出错，
+//	错误原因不明，可能是堆栈溢出。改成CJCLoggerLocal直接继承CSingleTonBase就没有错误。
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -171,11 +164,11 @@ typedef CJCLoggerLocal CJCLogger;
 class CJCLoggerNode
 {
 public:
-    CJCLoggerNode(const CJCStringW & name, int level, CJCLogger * logger = NULL);
+    CJCLoggerNode(const std::wstring & name, int level, CJCLogger * logger = NULL);
     virtual ~CJCLoggerNode(void);
 
 public:
-    static CJCLoggerNode * CreateLoggerNode(const CJCStringW & name, int level)
+    static CJCLoggerNode * CreateLoggerNode(const std::wstring & name, int level)
     {
         return new CJCLoggerNode(name, level);
     }
@@ -186,10 +179,10 @@ public:
 	void SetLevel(int level)	{ m_level = level; }
     int GetLevel()				{ return m_level;	}
     virtual void Delete()		{ delete this;	    }
-    const CJCStringW & GetNodeName() const		{ return m_category;}
+    const std::wstring & GetNodeName() const		{ return m_category;}
 
 protected:
-    CJCStringW m_category;
+    std::wstring m_category;
     int m_level;
 	CJCLogger * m_logger;
 };
@@ -200,7 +193,7 @@ class JCStaticLoggerNode : public CJCLoggerNode
 {
 public:
     JCStaticLoggerNode(
-        const CJCStringW & name, int level);
+        const std::wstring & name, int level);
     virtual ~JCStaticLoggerNode();
     virtual void Delete() { };
 
@@ -229,9 +222,11 @@ public:
     CJCStackTrace(CJCLoggerNode * log, const char * func_name, LPCTSTR msg);
     ~CJCStackTrace(void);
 
+	double GetRuntime(void);
+
 private:
     CJCLoggerNode * m_log;
-	CJCStringA	m_func_name;
+	std::string	m_func_name;
 	LONGLONG	m_start_time;
 };
 
@@ -246,7 +241,7 @@ public:
 	double GetDeltaTime(void);	// in us
 
 private:
-	CJCStringT m_func_name;
+	std::wstring m_func_name;
 	LONGLONG	m_start_time;
 };
 
@@ -402,6 +397,9 @@ public:
 #undef LOG_STACK_TRACE
 #define LOG_STACK_TRACE(...)   \
     CJCStackTrace __stack_trace__(_local_logger, __FUNCTION__, _T("") );
+
+
+#define RUNNING_TIME	(__stack_trace__.GetRuntime())
 
 #undef LOG_STACK_PERFORM
 #define LOG_STACK_PERFORM(name)   \

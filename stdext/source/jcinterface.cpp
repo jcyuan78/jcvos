@@ -11,11 +11,11 @@
 
 LOCAL_LOGGER_ENABLE(_T("Assertion"), LOGGER_LEVEL_DEBUGINFO);
 
-LOG_CLASS_SIZE(CJCInterfaceBase)
-
-CJCInterfaceBase::~CJCInterfaceBase(void)
-{
-#ifdef _DEBUG
-	JCASSERT(0 == m_ref || 1 == m_ref);
-#endif
-}
+//LOG_CLASS_SIZE(CJCInterfaceBase)
+//
+//CJCInterfaceBase::~CJCInterfaceBase(void)
+//{
+//#ifdef _DEBUG
+//	JCASSERT(0 == m_ref || 1 == m_ref);
+//#endif
+//}
