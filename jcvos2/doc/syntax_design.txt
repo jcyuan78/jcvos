@@ -1,0 +1,87 @@
+﻿本文当描述了SmiVendorTest语法定义。
+1，语法设计理念
+	考虑到用于手动命令输入，方法（命令/过程）的参数用参数名称定义，尽可能使用缺省参数值。
+	建立以表为基础的数据结构体系。尽可能支持表计算。
+	用表项的自动循环代替传统循环，以缩小代码量。
+	尽量使用符号代替关键字/命令。
+
+2，以实现语法
+	[program] =>	<MatchScript()>
+					[combo_st] \n [combo_st]
+					#[anything]				// comment
+					[help_statement]		// 严格上说，help语句后，不能接其他语句
+					
+	[combo_st] => 	<MatchComboSt()>
+					// 以下消除左递归
+					//[single_statement] 
+					// 
+					$([expr]) [S1]
+					@([expr]) [S1]
+					([expr]) [S1]
+					
+					${[combo_st]} [S1]
+					// 消除左递归: [combo_st] | [single_st] 
+					[single_st] [S1]
+					
+					
+	[single_st] => 	<MatchSingleSt()>
+					[id]:[id] [param_set]		// moudle:feature
+					
+					:[id] [param_set]			//default:feature
+						//[variable]
+						
+	[S1] =>			<MatchS1()>
+					| [single_st] [S1]
+					=> [id] 				// 给变量[id]赋值
+					E
+					
+	// 表达式
+	[expr] =>		<>
+					[vector_mk]
+						$(combo_statement)
+						@[variable]				// 表格
+						@(combo_statement)
+						
+					
+						
+	[vector_mk]	=>	[expr-1] : [expr-2]				// 产生一个从 [expr-1]到[expr-2]的矢量，增量为1
+					[expr-1] : [expr-2] : [expr-3]  // 产生一个从 [expr-1]到[expr-2]的矢量，增量为[expr-3]
+					
+	[factor] =>		<MatchFactor()>
+					$[variable]				// 变量
+					(string) / (numeral)	// 常数
+	
+	[feature] =>	<MatchFeature()>
+					([id] / E) : [id] [cmd_set] [param_set]
+					
+	[cmd_set] =>	
+					
+					
+	[param_set] => 	<MatchParamSet()>
+					// 消除左递归: [param_set] [parameter]
+					[param] [P1]
+					
+	[P1] =>			[param] [P1]
+					E
+						
+	[param] => 		<>
+					--[id]
+					--[id]=[factor]
+					-[ch]
+					-[ch][factor]
+
+					--[id]@					// 取对循环变量
+					--@[table]				// 取表格中的列名为参数名
+						
+		
+  [command] =>			: [id]
+						[id]:[id]
+						
+  [help_statement]	=> 	?						// list out all modules (or all features)
+						? [command]
+						? :						// list out features for default plugin
+						? :[id]					// show help message of feature
+						? [id]					// list out all features for plugin
+						? [id]:[id]				// show help message of feature 
+		
+3，待实现语法
