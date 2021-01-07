@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "async_file.h"
+#include <boost/cast.hpp>
 
 LOCAL_LOGGER_ENABLE(_T("file.async"), LOGGER_LEVEL_NOTICE);
 
@@ -133,7 +134,7 @@ void CAsyncOutputFile::Put(const wchar_t * buf, size_t buf_size)
 	DWORD written = 0;
 	{
 	LOG_STACK_PERFORM(_T("-Write"));
-	BOOL br = WriteFile(m_handle, line_buf, len, &written, ol);
+	BOOL br = WriteFile(m_handle, line_buf, boost::numeric_cast<DWORD>(len), &written, ol);
 	}
 	//LOG_DEBUG(_T("result of async write: %d, %d, written=%d"), br, GetLastError(), written );
 }

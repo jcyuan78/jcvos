@@ -168,6 +168,7 @@ namespace jcvos
 		const size_t size() const {return m_size * sizeof(PTR_TYPE);};
 		// return size in element
 		const size_t len() const { return m_size; }
+		PTR_TYPE * get_ptr(void) { return m_ptr; }
 
 	protected:
 		PTR_TYPE * m_ptr;

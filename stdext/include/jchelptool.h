@@ -52,6 +52,7 @@ namespace jcvos
 		return ( (UINT64)(hi)<<32 | (UINT64)(lo) );
 	}
 
+	///<summary> 获取当前系统时钟，以计数为单位 </summary>
 	inline LONGLONG	GetTimeStamp(void)
 	{
 		LARGE_INTEGER t0;		// 性能计算
@@ -59,11 +60,19 @@ namespace jcvos
 		return t0.QuadPart;
 	}
 
+
+	///<summary> 获取当前系统始终，以us为单位 </summary>
 	inline double	GetTimeStampUs(void)
 	{	// 返回以us为单位的time stamp
 		LARGE_INTEGER t0;		// 性能计算
 		QueryPerformanceCounter(&t0);
 		return (t0.QuadPart) * ts_cycle;
+	}
+
+	///<summary> 返回系统计时的周期，以us为单位 </summary>
+	inline double GetTsCycle(void)
+	{
+		return ts_cycle;
 	}
 
 };

@@ -6,7 +6,7 @@
 #include "comm_linux.h"
 #elif defined WIN32
 #include "comm_windows.h"
-#elif defined WIN64
+#elif defined _WIN64
 #include "comm_windows.h"
 #else
 #error no platform defined
