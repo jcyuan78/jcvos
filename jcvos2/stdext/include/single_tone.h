@@ -57,6 +57,10 @@ namespace jcvos
 				CSingleTonEntry::GetInstance<CGlobalSingleTon<T> >(instance);
 			return instance;
 		}
+		//static void Unregister(void)
+		//{
+
+		//}
 	};
 
 	// 由于.net中托管代码不能实现多重继承，以下采用非多重继承聚合方案
@@ -118,7 +122,7 @@ public:
 	static CSingleTonEntry * Instance(void);
 	bool QueryStInstance(const GUID & guid, jcvos::CSingleTonBase * & obj);
 	bool RegisterStInstance(const GUID & guid, jcvos::CSingleTonBase * obj);
-
+	static void Unregister(void);
 public:
 	template <class T>
 	static void GetInstance(T * & obj)
