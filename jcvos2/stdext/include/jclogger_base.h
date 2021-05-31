@@ -173,8 +173,8 @@ public:
         return new CJCLoggerNode(name, level);
     }
 
-    void LogMessageFunc(LPCSTR function, LPCTSTR format, ...);
-    void LogMessageFuncV(LPCSTR function, LPCTSTR format, va_list arg);
+    void LogMessageFunc(const wchar_t * function, LPCTSTR format, ...);
+    void LogMessageFuncV(const wchar_t* function, LPCTSTR format, va_list arg);
 
 	void SetLevel(int level)	{ m_level = level; }
     int GetLevel()				{ return m_level;	}
@@ -219,14 +219,14 @@ private:
 class CJCStackTrace
 {
 public:
-    CJCStackTrace(CJCLoggerNode * log, const char * func_name, LPCTSTR msg);
+    CJCStackTrace(CJCLoggerNode * log, const wchar_t * func_name, LPCTSTR msg);
     ~CJCStackTrace(void);
 
 	double GetRuntime(void);
 
 private:
     CJCLoggerNode * m_log;
-	std::string	m_func_name;
+	std::wstring	m_func_name;
 	LONGLONG	m_start_time;
 };
 
@@ -236,7 +236,7 @@ private:
 class CJCStackPerformance
 {
 public:
-    CJCStackPerformance(LPCTSTR func_name);
+    CJCStackPerformance(const wchar_t * func_name);
     ~CJCStackPerformance(void);
 	double GetDeltaTime(void);	// in us
 
@@ -253,7 +253,7 @@ class CJCLogClassSize
 public:
 	CJCLogClassSize(const wchar_t * class_name, CJCLoggerNode * log)
 	{
-		if (log)		log->LogMessageFunc(("[ClassSize]"), _T("sizeof(%ls)\t\t= %d"), 
+		if (log)		log->LogMessageFunc(L"[ClassSize]", L"sizeof(%ls)\t\t= %d", 
 			class_name, (UINT)(sizeof(TYPE)) );
 	}
 };
@@ -320,15 +320,15 @@ public:
 #ifdef	LOG_OUT_CLASS_SIZE
 
 #undef LOG_CLASS_SIZE
-#define LOG_CLASS_SIZE(type)  CJCLogClassSize<type> _size_of_##type(_T(#type), _local_logger);
+#define LOG_CLASS_SIZE(type)  CJCLogClassSize<type> _size_of_##type(L#type, _local_logger);
 
 #undef LOG_CLASS_SIZE_T
-#define LOG_CLASS_SIZE_T(type, sn)	CJCLogClassSize<type> _size_of_##sn(_T(#type), _local_logger);
+#define LOG_CLASS_SIZE_T(type, sn)	CJCLogClassSize<type> _size_of_##sn(L#type, _local_logger);
 
 #undef LOG_CLASS_SIZE_T1
 #define LOG_CLASS_SIZE_T1(class_name, type1)	\
 	CJCLogClassSize< class_name<type1> >		\
-	_size_of_##class_name_##type1(_T(#class_name)_T("<")_T(#type1)_T(">"), _local_logger);
+	_size_of_##class_name_##type1(L#class_name L"<" L#type1 L">", _local_logger);
 
 #endif
 
@@ -338,7 +338,7 @@ public:
 #undef _LOGGER_CRITICAL
 #define _LOGGER_CRITICAL( _logger, ...) { \
     if (_logger && _logger->GetLevel()>= LOGGER_LEVEL_CRITICAL)    \
-        _logger->LogMessageFunc(__FUNCTION__, __VA_ARGS__);   \
+        _logger->LogMessageFunc(__STR2WSTR__(__FUNCTION__), __VA_ARGS__);   \
     }
 
 #if LOGGER_LEVEL >= LOGGER_LEVEL_RELEASEINFO
@@ -346,7 +346,7 @@ public:
 #undef _LOGGER_RELEASE
 #define _LOGGER_RELEASE( _logger, ...) { \
     if (_logger && _logger->GetLevel()>= LOGGER_LEVEL_RELEASEINFO)    \
-        _logger->LogMessageFunc(__FUNCTION__, __VA_ARGS__);   \
+        _logger->LogMessageFunc(__STR2WSTR__(__FUNCTION__), __VA_ARGS__);   \
     }
 
 #if LOGGER_LEVEL >= LOGGER_LEVEL_ERROR
@@ -354,7 +354,7 @@ public:
 #undef _LOGGER_ERROR
 #define _LOGGER_ERROR( _logger, ...) { \
     if (_logger && _logger->GetLevel()>= LOGGER_LEVEL_ERROR)    \
-        _logger->LogMessageFunc(__FUNCTION__, __VA_ARGS__);   \
+        _logger->LogMessageFunc(__STR2WSTR__(__FUNCTION__), __VA_ARGS__);   \
     }
 
 #ifdef WIN32
@@ -367,7 +367,7 @@ public:
 			NULL, err_id, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), \
 			(LPTSTR) &strSysMsg, 0, NULL );								\
 	    if (_logger && _logger->GetLevel()>= LOGGER_LEVEL_ERROR)		\
-		    _logger->LogMessageFunc(__FUNCTION__, _T("[WiN32 ERR] %d, %s @ %s"), err_id, strSysMsg, msg);	\
+		    _logger->LogMessageFunc(__STR2WSTR__(__FUNCTION__), L"[WiN32 ERR] %d, %s @ %s", err_id, strSysMsg, msg);	\
 		LocalFree(strSysMsg);											\
 	}
 
@@ -379,7 +379,7 @@ public:
 #undef _LOGGER_WARNING
 #define _LOGGER_WARNING( _logger, ...) { \
     if (_logger && _logger->GetLevel()>= LOGGER_LEVEL_WARNING)    \
-        _logger->LogMessageFunc(__FUNCTION__, __VA_ARGS__);   \
+        _logger->LogMessageFunc(__STR2WSTR__(__FUNCTION__), __VA_ARGS__);   \
     }
 
 
@@ -387,7 +387,7 @@ public:
 #undef _LOGGER_NOTICE
 #define _LOGGER_NOTICE( _logger, ...) { \
     if (_logger && _logger->GetLevel()>= LOGGER_LEVEL_NOTICE)    \
-        _logger->LogMessageFunc(__FUNCTION__, __VA_ARGS__);   \
+        _logger->LogMessageFunc(__STR2WSTR__(__FUNCTION__), __VA_ARGS__);   \
     }
 
 
@@ -396,44 +396,44 @@ public:
 
 #undef LOG_STACK_TRACE
 #define LOG_STACK_TRACE(...)   \
-    CJCStackTrace __stack_trace__(_local_logger, __FUNCTION__, _T("") );
+    CJCStackTrace __stack_trace__(_local_logger, __STR2WSTR__(__FUNCTION__), L"" );
 
 
 #define RUNNING_TIME	(__stack_trace__.GetRuntime())
 
 #undef LOG_STACK_PERFORM
 #define LOG_STACK_PERFORM(name)   \
-    CJCStackPerformance __stack_perform__(_T(__FUNCTION__)name);
+    CJCStackPerformance __stack_perform__(__STR2WSTR__(__FUNCTION__)name);
 
 #undef LOG_STACK_TRACE_EX
 #define LOG_STACK_TRACE_EX(fmt, ...)											\
 	LPTSTR __temp_str = new TCHAR[256];											\
 	jcvos::jc_sprintf(__temp_str, 256, fmt, __VA_ARGS__);						\
-    CJCStackTrace __stack_trace__(_local_logger, __FUNCTION__, __temp_str );	\
+    CJCStackTrace __stack_trace__(_local_logger, __STR2WSTR__(__FUNCTION__), __temp_str );	\
 	delete [] __temp_str;
 
 #undef LOG_STACK_TRACE_O
 #define LOG_STACK_TRACE_O(...)   \
 	LPTSTR __temp_str = new TCHAR[512];		\
-	int __ir = jcvos::jc_sprintf(__temp_str, 512, _T("pt=0x%08X"), (UINT)(this) );	\
+	int __ir = jcvos::jc_sprintf(__temp_str, 512, L"pt=0x%08X", (UINT)(this) );	\
 	jcvos::jc_sprintf(__temp_str+__ir, 512-__ir, __VA_ARGS__);	\
-    CJCStackTrace __stack_trace__(_local_logger, __FUNCTION__, __temp_str );	\
+    CJCStackTrace __stack_trace__(_local_logger, __STR2WSTR__(__FUNCTION__), __temp_str );	\
 	delete [] __temp_str;
 
 #undef LOGGER_SIMPLE_TRACE
 #define LOGGER_SIMPLE_TRACE( _logger, ... ) {  \
     if (_logger && _logger->GetLevel()>= LOGGER_LEVEL_TRACE)    \
 		LPTSTR __temp_str = new TCHAR[512];		\
-		int __ir = jcvos::jc_sprintf(__temp_str, 512, _T("[TRACE]") );	\
+		int __ir = jcvos::jc_sprintf(__temp_str, 512, L"[TRACE]" );	\
 		jcvos::jc_sprintf(__temp_str+__ir, 512-__ir, __VA_ARGS__);	\
-        _logger->LogMessageFunc((__FUNCTION__), __temp_str);   \
+        _logger->LogMessageFunc(__STR2WSTR__(__FUNCTION__), __temp_str);   \
 		delete [] __temp_str;	\
     }
 
 #undef _LOGGER_TRACE
 #define _LOGGER_TRACE( _logger, ... ) {  \
     if (_logger && _logger->GetLevel()>= LOGGER_LEVEL_TRACE)    \
-        _logger->LogMessageFunc((__FUNCTION__), __VA_ARGS__);   \
+        _logger->LogMessageFunc(__STR2WSTR__(__FUNCTION__), __VA_ARGS__);   \
     }
 
 #if LOGGER_LEVEL >= LOGGER_LEVEL_DEBUGINFO
@@ -441,7 +441,7 @@ public:
 #undef  _LOGGER_DEBUG
 #define _LOGGER_DEBUG( _logger, lv_adj, ... ) {  \
     if (_logger && _logger->GetLevel()>= (LOGGER_LEVEL_DEBUGINFO + lv_adj) )    \
-        _logger->LogMessageFunc((__FUNCTION__), __VA_ARGS__);   \
+        _logger->LogMessageFunc(__STR2WSTR__(__FUNCTION__), __VA_ARGS__);   \
     }
 
 #endif      //LOGGER_LEVEL_DEBUGINFO

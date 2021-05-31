@@ -60,6 +60,10 @@ typedef std::wstring	CJCStringT;
 typedef std::string	CJCStringT;
 #endif
 
+#define __STR2WSTR(str)	L ## str
+#define __STR2WSTR__(str)  __STR2WSTR(str)
+
+#define __W_FILE__ __STR2WSTR__(__FILE__)
 
 
 typedef const char * LPCSTR;
@@ -86,12 +90,12 @@ inline void DO_NOTHING(void) {};
 
 extern "C"
 {
-	void LogAssertion(LPCSTR source_name, int source_line, LPCTSTR str_exp);
+	void LogAssertion(const wchar_t * source_name, int source_line, LPCTSTR str_exp);
 }
 
 #define JCASSERT(exp) {										\
     if ( ! (exp) ) {										\
-        LogAssertion(__FILE__, __LINE__, _T(#exp));		\
+        LogAssertion(__STR2WSTR__(__FILE__), __LINE__, L#exp);		\
         jcbreak;										\
     }   }
 #else
