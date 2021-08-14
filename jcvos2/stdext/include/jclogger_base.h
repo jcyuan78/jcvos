@@ -357,6 +357,11 @@ public:
         _logger->LogMessageFunc(__STR2WSTR__(__FUNCTION__), __VA_ARGS__);   \
     }
 
+#undef _LOGGER_ERROR_EX
+#define _LOGGER_ERROR_EX( _logger, msg, code, ...)			\
+    if (_logger && _logger->GetLevel()>= LOGGER_LEVEL_ERROR)    \
+        _logger->LogMessageFunc(__STR2WSTR__(__FUNCTION__), (L"[err %04d] " msg), code, __VA_ARGS__);
+
 #ifdef WIN32
 
 #undef _LOGGER_WIN32_ERROR
@@ -460,6 +465,9 @@ public:
 #define LOG_CRITICAL(...)				_LOGGER_CRITICAL(_local_logger, __VA_ARGS__);
 #define LOG_RELEASE(...)				_LOGGER_RELEASE(_local_logger, __VA_ARGS__);
 #define LOG_ERROR(...)					_LOGGER_ERROR(_local_logger, __VA_ARGS__);
+#define LOG_ERROR_EX(code, msg, ...)	do {_LOGGER_ERROR(_local_logger, \
+	(L"[err %04d] " msg), code, __VA_ARGS__) } while(0)
+
 #define LOG_WIN32_ERROR(...)			_LOGGER_WIN32_ERROR(_local_logger, GetLastError(), __VA_ARGS__)
 #define LOG_WIN32_ERROR_ID(id, ...)		_LOGGER_WIN32_ERROR(_local_logger, id, __VA_ARGS__)
 #define LOG_WARNING(...)				_LOGGER_WARNING(_local_logger, __VA_ARGS__);

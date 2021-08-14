@@ -34,6 +34,8 @@ namespace jcvos
 		    ERR_CLIENT =	0x06000000,
 		    ERR_SERVER =	0x07000000,
 		    ERR_SYSTEM =	0x08000000,
+			// 内存分配错误
+			ERR_MEM =		0x09000000,
 	    };    
 
     public:

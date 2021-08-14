@@ -56,23 +56,23 @@ namespace jcvos
 
 ///////////////////////////////////////////////////////////////////////////////
 // -- implementation of auto handle
-	template <> void CCloseHandle<FILE*>::DoCloseHandle(FILE* file)
+	template <> inline void CCloseHandle<FILE*>::DoCloseHandle(FILE* file)
 	{
 		if (file) fclose(file);
 	}
 
-	template <> void CCloseHandle<IJCInterface*>::DoCloseHandle(IJCInterface * ptr)
+	template <> inline void CCloseHandle<IJCInterface*>::DoCloseHandle(IJCInterface * ptr)
 	{
 		if (ptr) ptr->Release();
 	}
 
 #ifdef WIN32
-	template <> void CCloseHandle<HANDLE>::DoCloseHandle(HANDLE handle)
+	template <> inline void CCloseHandle<HANDLE>::DoCloseHandle(HANDLE handle)
 	{
 		if (handle)	    ::CloseHandle(handle);
 	}
 
-	template <> void CCloseHandle<HKEY>::DoCloseHandle(HKEY hkey)
+	template <> inline void CCloseHandle<HKEY>::DoCloseHandle(HKEY hkey)
 	{
 		if (hkey)	::RegCloseKey(hkey);
 	}
@@ -135,7 +135,7 @@ namespace jcvos
 		PTYPE * operator &()	{ return &m_ptr; };
 		TYPE & operator *()		{ return *m_ptr; };
 		PTYPE operator + (int offset)	{ return m_ptr + offset; };
-		TYPE * detatch(/*PTYPE & type*/)
+		TYPE * detach(/*PTYPE & type*/)
 		{
 			TYPE * type = m_ptr;
 			m_ptr=NULL;
@@ -169,6 +169,12 @@ namespace jcvos
 		// return size in element
 		const size_t len() const { return m_size; }
 		PTR_TYPE * get_ptr(void) { return m_ptr; }
+		PTR_TYPE* detach(/*PTYPE & type*/)
+		{
+			PTR_TYPE* type = m_ptr;
+			m_ptr = NULL;
+			return type;
+		};
 
 	protected:
 		PTR_TYPE * m_ptr;
@@ -271,6 +277,8 @@ namespace jcvos
 
 		PTYPE * operator &()	{ return &m_ptr; };
 		TYPE & operator *()		{ return *m_ptr; };
+		operator void* () { return (void*)(&m_ptr); }
+		operator bool() { return m_ptr != NULL; }
 		bool operator !()	const	{ return NULL == m_ptr; };
 		bool operator == (const TYPE * ptr)	const	{ return /*const*/ ptr == m_ptr;};
 		bool valid() const {return NULL != m_ptr;}

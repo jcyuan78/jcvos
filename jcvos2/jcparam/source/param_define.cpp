@@ -63,7 +63,7 @@ CArguDefList::RULE & CArguDefList::RULE::operator() (
 	// add descriptions to map
 	jcvos::auto_ptr<CArguDescBase> ptr_arg( new CArguDescBase(name, abbrev, vt, desc) );
 	CArguDefList::RULE & rule = operator() (ptr_arg);
-	ptr_arg.detatch();
+	ptr_arg.detach();
 	return rule;
 }
 

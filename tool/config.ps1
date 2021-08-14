@@ -12,7 +12,7 @@
 	Specify the full path of OPENCV installed on your PC.
 #>
 
-param($path_lib, $path_vld, $path_boost, $path_winddk, $path_opencv,
+param($path_lib="C:\library\", $path_vld, $path_boost, $path_winddk, $path_opencv,
  $path_zbar, $path_curl, $path_graphviz)
 #path_lib： 库文件所在目录，指定这个目录后，可以自动搜索相关库文件
 
@@ -33,6 +33,23 @@ if (test-path -path $prop_file)
 	remove-item -force $prop_file
 }
 
+if (-not ([String]::IsNullOrEmpty($path_lib)))
+{
+	$files = dir $path_lib;
+	foreach ($dir in $files)
+	{
+		if ($dir -match "^boost")
+		{
+			$path_boost = $dir.fullname;
+		}
+	}
+}
+
+if (test-path "${env:ProgramFiles(x86)}\Visual Leak Detector\")
+{
+	$path_vld = "${env:ProgramFiles(x86)}\Visual Leak Detector"
+}
+		
 
 #check boost folder
 if ( [String]::IsNullOrEmpty($path_boost) )
