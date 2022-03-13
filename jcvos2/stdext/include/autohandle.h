@@ -314,7 +314,7 @@ namespace jcvos
 		TYPE * operator ->()	{ return dynamic_cast<TYPE*>(m_ptr); };
 		TYPE & operator *()		{ return *dynamic_cast<TYPE*>(m_ptr); };
 
-		template <typename TRG_TYPE>
+		template <typename TRG_TYPE=TYPE*>
 		TRG_TYPE d_cast() { return dynamic_cast<TRG_TYPE>(m_ptr); };
 
 		template <typename TRG_TYPE>
@@ -325,10 +325,7 @@ namespace jcvos
 			m_ptr = NULL;
 		};
 
-		operator BASE_TYPE * & ()	
-		{
-			return m_ptr;
-		}
+		operator BASE_TYPE * & ()	{	return m_ptr;	}
 
 		auto_cif<TYPE, BASE_TYPE> & operator = (TYPE* ptr) 
 		{

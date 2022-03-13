@@ -19,8 +19,8 @@
 // 关于整数的定义
 
 // 对于32位系统，所有用于内存索引，下标的类型全部定义为32位
-//typedef UINT	JCSIZE;
-//JCSIZE operator = (size_t s)	{return (JCSIZE)s;};
+//typedef UINT	size_t;
+//size_t operator = (size_t s)	{return (size_t)s;};
 
 // 外部索引，全部使用64位
 typedef UINT64	FILESIZE;

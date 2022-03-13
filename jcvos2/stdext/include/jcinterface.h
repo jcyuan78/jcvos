@@ -33,51 +33,6 @@ void ADDREF(T* ptr)
 	if (ptr) ptr->AddRef();
 }
 
-//#define IMPLEMENT_INTERFACE		\
-//	protected:	\
-//	mutable __declspec(align(4))	long	m_ref;	\
-//	public:	\
-//	inline virtual void AddRef()			{	LockedIncrement(m_ref); }		\
-//	inline virtual void Release(void)		{	if (LockedDecrement(m_ref) == 0) delete this;	}	\
-//	virtual bool QueryInterface(const char * if_name, IJCInterface * &if_ptr) {return false;}
-//
-/*
-class CJCInterfaceBase : virtual public IJCInterface
-{
-protected:
-	CJCInterfaceBase(void) : m_ref(1) {};
-	virtual ~CJCInterfaceBase(void);
-
-#ifdef _DEBUG
-protected:
-#else
-private:
-#endif
-
-#ifdef WIN32
-	mutable __declspec(align(4))	long	m_ref;
-#else
-	mutable long	m_ref;
-#endif
-
-public:
-	inline virtual void AddRef() 
-	{
-		LockedIncrement(m_ref);
-	}
-
-	inline virtual void Release(void)		
-	{
-		if (LockedDecrement(m_ref) == 0) delete this;
-	}
-	
-	virtual bool QueryInterface(const char * if_name, IJCInterface * &if_ptr) 
-	{
-		if_ptr=NULL;
-		return false;
-	};
-};
-*/
 ///////////////////////////////////////////////////////////////////////////////
 // -- Implements
 namespace jcvos
@@ -86,19 +41,25 @@ namespace jcvos
 	class CDynamicInstance : public ImpClass
 	{
 	public:
-		template <typename P> CDynamicInstance(P & p) : m_ref(1), ImpClass(p) {};
 		CDynamicInstance<ImpClass>(void) : m_ref(1) {};
 		virtual ~CDynamicInstance<ImpClass>(void)	{};
-		static ImpClass * Create(void)
-		{
-			return static_cast<ImpClass*>(new jcvos::CDynamicInstance<ImpClass>);
-		}
+		static ImpClass * Create(void)	{	return static_cast<ImpClass*>(new jcvos::CDynamicInstance<ImpClass>);	}
+
+		//template <typename P> CDynamicInstance(P p) : m_ref(1), ImpClass(p) {};
+	//	template <typename P>
+	//	static ImpClass * Create(P p)	{	return static_cast<ImpClass*>(new jcvos::CDynamicInstance<ImpClass>(p));	}
 	protected:
 		mutable __declspec(align(4))	long	m_ref;
 	public:
 		inline virtual void AddRef()			{	LockedIncrement(m_ref); }		
 		inline virtual void Release(void)		{	if (LockedDecrement(m_ref) == 0) delete this;	}	
 		virtual bool QueryInterface(const char * if_name, IJCInterface * &if_ptr) {return false;}
+		virtual bool CreateObject(IJCInterface*& obj)
+		{
+			JCASSERT(obj == NULL);
+			obj = static_cast<IJCInterface*>(Create());
+			return true;
+		}
 	};
 
 	template <class ImpClass>

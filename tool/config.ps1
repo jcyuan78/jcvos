@@ -12,9 +12,9 @@
 	Specify the full path of OPENCV installed on your PC.
 #>
 
-param($path_lib="C:\library\", $path_vld, $path_boost, $path_winddk, $path_opencv,
+
+param($path_vld, $path_boost, $path_winddk, $path_opencv,
  $path_zbar, $path_curl, $path_graphviz)
-#path_lib： 库文件所在目录，指定这个目录后，可以自动搜索相关库文件
 
 $path_workspace = resolve-path ".."
 write-host "Workspace path: " $path_workspace
@@ -33,23 +33,17 @@ if (test-path -path $prop_file)
 	remove-item -force $prop_file
 }
 
-if (-not ([String]::IsNullOrEmpty($path_lib)))
+<#
+if (!($path_vld) )
 {
-	$files = dir $path_lib;
-	foreach ($dir in $files)
-	{
-		if ($dir -match "^boost")
-		{
-			$path_boost = $dir.fullname;
-		}
-	}
+	$path_vld = resolve-path "..\extlib\vld"
+	cp $path_vld"/vld_v1_15.props" $path_vld"\support_vld.props"
 }
-
-if (test-path "${env:ProgramFiles(x86)}\Visual Leak Detector\")
+else
 {
-	$path_vld = "${env:ProgramFiles(x86)}\Visual Leak Detector"
+	cp $path_workspace"/extlib/vld/vld_v2_1.props" $path_workspace"/extlib/vld/support_vld.props"
 }
-		
+#>
 
 #check boost folder
 if ( [String]::IsNullOrEmpty($path_boost) )
@@ -61,6 +55,7 @@ if ( [String]::IsNullOrEmpty($path_vld) )
 {
 	$path_vld = read-host "input vld folder"
 }
+
 
 $prop_list = @()
 $prop_list += @{name="VLDDIR"; val=$path_vld}
@@ -81,11 +76,13 @@ $prop_grp = $project.PropertyGroup[0];
 $item_grp = $prop_doc.CreateElement("ItemGroup", $project.NamespaceURI)
 foreach ($p in $prop_list)
 {
-#	if ($p.val -ne $null)
-#	{
+#	$name = $p.name;
+#	$val = $p.val;
+#write-host "NAME=$name, VAL=$val"
+	if ($p.val -ne $null)
+	{
 		$mm = $prop_doc.CreateElement($p.name, $project.NamespaceURI);
-		if ($p.val -eq $null) {$mm.InnerText="";}
-		else {		$mm.InnerText=$p.val;}
+		$mm.InnerText=$p.val;
 		$prop_grp.AppendChild($mm);
 		
 		$ii = $prop_doc.CreateElement("BuildMacro", $project.NamespaceURI);
@@ -94,11 +91,37 @@ foreach ($p in $prop_list)
 		$vv.InnerText = [String]::Format("{0}({1})", "$", $p.name);
 		$ii.AppendChild($vv);
 		$item_grp.AppendChild($ii);
-#	}
+	}
 }
 $prop_doc.Project.AppendChild($item_grp);
 
 $prop_doc.Save($prop_file)
+
+<#
+
+
+
+'<?xml version="1.0"?>' >> $prop_file
+"<VisualStudioPropertySheet"  >> $prop_file
+"	ProjectType=""Visual C++"" " >> $prop_file
+"	Version=""8.00"" "  >> $prop_file
+"	Name=""external_libs"" "  >> $prop_file
+"	>"  >> $prop_file
+
+foreach ($p in $prop_list)
+{
+	if ($p.val)
+	{
+		"	<UserMacro" >> $prop_file
+		"		Name=""" + $p.name + '"'	>> $prop_file
+		"		Value=""" + $p.val + '"'	>> $prop_file
+		"	/>" >> $prop_file
+	}
+}	
+"</VisualStudioPropertySheet>"  >> $prop_file
+write-host "Cofiguation completed."
+
+#>
 
 #<TODO> create local_config.h for jcvos
 

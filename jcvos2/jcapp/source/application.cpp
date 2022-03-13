@@ -144,7 +144,7 @@ bool CJCAppBase::LoadApplicationInfo(void)
 	static const TCHAR _KEY[] = _T("\\StringFileInfo\\040904B0\\%s");
 	//TCHAR sub_key[128];
 	LPVOID key_val = NULL;
-	JCSIZE length = 0;
+	size_t length = 0;
 
 	jcvos::jc_sprintf(str_temp, MAX_PATH, _KEY, _T("FileVersion"));
 	br = VerQueryValue(ver_buf, str_temp, &key_val, &length);
