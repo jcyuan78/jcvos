@@ -4,7 +4,7 @@
 #include "../include/jchelptool.h"
 #include "../include/jcexception.h"
 
-LOCAL_LOGGER_ENABLE(CJCStringT(_T("ERROR")), LOGGER_LEVEL_ERROR);
+LOCAL_LOGGER_ENABLE(L"ERROR", LOGGER_LEVEL_ERROR);
 
 jcvos::CJCException::CJCException(
     LPCTSTR msg, jcvos::CJCException::ERROR_LEVEL level, UINT id )
@@ -36,7 +36,7 @@ const char * jcvos::CJCException::what() const throw()
 //--
 #ifdef WIN32
 jcvos::CWin32Exception::CWin32Exception(DWORD err_id, const CJCStringT& msg, jcvos::CJCException::ERROR_LEVEL level)
-    : CJCException(_T(""), level, (int)err_id)
+    : CJCException(L"", level, (int)err_id)
 {
     LPTSTR strSysMsg=NULL;
 	DWORD ir =FormatMessage(
@@ -46,8 +46,8 @@ jcvos::CWin32Exception::CWin32Exception(DWORD err_id, const CJCStringT& msg, jcv
 		(LPTSTR) &strSysMsg, 
 		0, NULL );
 	TCHAR str_err_id[32];
-	jc_sprintf(str_err_id, _T(" \n\t#%d: "), err_id);
-	if (ir==0 || strSysMsg==NULL)	m_err_msg = msg + str_err_id + _T("Unknow Error");
+	jc_sprintf(str_err_id, L" \n\t#%d: ", err_id);
+	if (ir==0 || strSysMsg==NULL)	m_err_msg = msg + str_err_id + L"Unknow Error";
 	else m_err_msg = msg + str_err_id + strSysMsg;
 	LocalFree(strSysMsg);
 }
@@ -58,24 +58,21 @@ jcvos::CWin32Exception::CWin32Exception(DWORD err_id, const CJCStringT& msg, jcv
 //-- Assertion
 
 //#ifdef _DEBUG
-void LogAssertion(LPCSTR source_name, int source_line, LPCTSTR str_exp)
+void LogAssertion(const wchar_t * source_name, int source_line, LPCTSTR str_exp)
 {
 #ifdef WIN32
     if (_local_logger && _local_logger->GetLevel()>= LOGGER_LEVEL_CRITICAL)
-        _local_logger->LogMessageFunc(source_name, _T("<LINE=%d> [Assert] %ls"), source_line, str_exp);
-
-	//LOG_CRITICAL(_T("[Assert] file=\"%S\", line=%d, exp=%ls"),
-	//	source_name, source_line, str_exp);
+        _local_logger->LogMessageFunc(source_name, L"<LINE=%d> [Assert] %ls", source_line, str_exp);
 #else
-	LOG_CRITICAL(_T("Assert"), _T("file=\"%s\", line=%d, exp=%ls"),
+	LOG_CRITICAL(L"Assert", L"file=\"%s\", line=%d, exp=%ls",
 		source_name, source_line, str_exp);
 #endif
 }
 
-void LogException(LPCSTR function, int line, jcvos::CJCException & err)
+void LogException(const wchar_t * function, int line, jcvos::CJCException & err)
 {
     if (_local_logger && _local_logger->GetLevel()>= LOGGER_LEVEL_CRITICAL)
-        _local_logger->LogMessageFunc(function, _T("<LINE=%d> [Exception] %ls"), line, err.WhatT());
+        _local_logger->LogMessageFunc(function, L"<LINE=%d> [Exception] %ls", line, err.WhatT());
 }
 
 //#endif

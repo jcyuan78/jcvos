@@ -104,6 +104,12 @@ namespace jcvos
 		inline virtual void AddRef()			{	LockedIncrement(m_ref); }		
 		inline virtual void Release(void)		{	if (LockedDecrement(m_ref) == 0) delete this;	}	
 		virtual bool QueryInterface(const char * if_name, IJCInterface * &if_ptr) {return false;}
+		virtual bool CreateObject(IJCInterface*& obj)
+		{
+			JCASSERT(obj == NULL);
+			obj = static_cast<IJCInterface*>(Create());
+			return true;
+		}
 	};
 
 	template <class ImpClass>

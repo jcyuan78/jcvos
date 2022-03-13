@@ -19,8 +19,8 @@
 // 关于整数的定义
 
 // 对于32位系统，所有用于内存索引，下标的类型全部定义为32位
-//typedef UINT	JCSIZE;
-//JCSIZE operator = (size_t s)	{return (JCSIZE)s;};
+//typedef UINT	size_t;
+//size_t operator = (size_t s)	{return (size_t)s;};
 
 // 外部索引，全部使用64位
 typedef UINT64	FILESIZE;
@@ -60,6 +60,10 @@ typedef std::wstring	CJCStringT;
 typedef std::string	CJCStringT;
 #endif
 
+#define __STR2WSTR(str)	L ## str
+#define __STR2WSTR__(str)  __STR2WSTR(str)
+
+#define __W_FILE__ __STR2WSTR__(__FILE__)
 
 
 typedef const char * LPCSTR;
@@ -86,12 +90,12 @@ inline void DO_NOTHING(void) {};
 
 extern "C"
 {
-	void LogAssertion(LPCSTR source_name, int source_line, LPCTSTR str_exp);
+	void LogAssertion(const wchar_t * source_name, int source_line, LPCTSTR str_exp);
 }
 
 #define JCASSERT(exp) {										\
     if ( ! (exp) ) {										\
-        LogAssertion(__FILE__, __LINE__, _T(#exp));		\
+        LogAssertion(__STR2WSTR__(__FILE__), __LINE__, L#exp);		\
         jcbreak;										\
     }   }
 #else

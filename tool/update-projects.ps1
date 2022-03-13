@@ -1,5 +1,7 @@
 # This script is used to update vc project file for fitting vs 2019 or vs 2017
-param($tar, $vs_ver, $win_sdk="10.0.17763.0")
+param($vs_ver, $win_sdk="10.0.17763.0")
+$tar = resolve-path "$pwd\..\"
+$global:vs_ver = $vs_ver
 
 $applications = dir $tar\*.vcxproj -recurse;
 #- | ?{$_.Attributes -eq "Directory"}

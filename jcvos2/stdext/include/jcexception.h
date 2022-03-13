@@ -34,6 +34,8 @@ namespace jcvos
 		    ERR_CLIENT =	0x06000000,
 		    ERR_SERVER =	0x07000000,
 		    ERR_SYSTEM =	0x08000000,
+			// 内存分配错误
+			ERR_MEM =		0x09000000,
 	    };    
 
     public:
@@ -74,7 +76,7 @@ namespace jcvos
 
 extern "C"
 {
-	void LogException(LPCSTR function, int line, jcvos::CJCException & err); 
+	void LogException(const wchar_t * function, int line, jcvos::CJCException & err); 
 }
 
 inline void _NOTSUPPORT(LPCTSTR msg = NULL)
@@ -86,7 +88,7 @@ inline void _NOTSUPPORT(LPCTSTR msg = NULL)
 
 //#define NOT_SUPPORT(T)		_NOTSUPPORT(_T(__FUNCTION__) _T(" is not supported")); return T(0);
 //#define NOT_SUPPORT0		_NOTSUPPORT(_T(__FUNCTION__) _T(" is not supported"));
-#define NOT_SUPPORT(act, ...)	{_NOTSUPPORT(_T(__FUNCTION__) _T(" is not supported")); act;}		
+#define NOT_SUPPORT(act, ...)	{_NOTSUPPORT(__STR2WSTR__(__FUNCTION__) _T(" is not supported")); act;}		
 //#define NOT_SUPPORT1(T, ...)	_NOTSUPPORT(__VA_ARGS_); return T(0);		
 	
 
@@ -95,7 +97,7 @@ inline void _NOTSUPPORT(LPCTSTR msg = NULL)
 		jcvos::jc_sprintf(__temp_str, 512, __VA_ARGS__);	\
 		jcvos::CJCException err(__temp_str, jcvos::CJCException::level); \
 		delete [] __temp_str;						\
-        LogException(__FUNCTION__, __LINE__, err);	\
+        LogException(__STR2WSTR__(__FUNCTION__), __LINE__, err);	\
         throw err; }
 
 #define THROW_ERROR_EX(level, id, ...)   {					\
@@ -103,7 +105,7 @@ inline void _NOTSUPPORT(LPCTSTR msg = NULL)
 		jcvos::jc_sprintf(__temp_str, 512, __VA_ARGS__);	\
 		jcvos::CJCException err(__temp_str, jcvos::CJCException::level, id); \
 		delete [] __temp_str;						\
-        LogException(__FUNCTION__, __LINE__, err);	\
+        LogException(__STR2WSTR__(__FUNCTION__), __LINE__, err);	\
         throw err; }
 
 #ifdef WIN32
@@ -113,7 +115,7 @@ inline void _NOTSUPPORT(LPCTSTR msg = NULL)
 		jcvos::jc_sprintf(__temp_str, 512, msg, __VA_ARGS__);			\
         jcvos::CWin32Exception err(err_id, __temp_str);				\
  		delete [] __temp_str;											\
-        LogException(__FUNCTION__, __LINE__, err);						\
+        LogException(__STR2WSTR__(__FUNCTION__), __LINE__, err);						\
         throw err;  \
     }
 
@@ -122,7 +124,7 @@ inline void _NOTSUPPORT(LPCTSTR msg = NULL)
 		jcvos::jc_sprintf(__temp_str, 512, msg, __VA_ARGS__);					\
         jcvos::CWin32Exception err(errid, __temp_str);					\
  		delete [] __temp_str;											\
-        LogException(__FUNCTION__, __LINE__, err);					\
+        LogException(__STR2WSTR__(__FUNCTION__), __LINE__, err);					\
         throw err;  \
     }
 #endif

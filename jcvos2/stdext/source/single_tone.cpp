@@ -159,7 +159,7 @@ size_t CSingleTonContainer::UnRegisterEntry(UINT entry_id)
 	{
 		if (m_instance[ii] && m_instance_entry[ii] == entry_id)
 		{
-//			const GUID gg=m_instance[ii]->GetGuid();
+			const GUID gg=m_instance[ii]->GetGuid();
 			m_instance[ii]->Release();
 			m_instance[ii] = NULL;
 			m_instance_entry[ii] = 0xFF;
@@ -390,8 +390,3 @@ bool CSingleTonEntry::RegisterStInstance(const GUID & guid, jcvos::CSingleTonBas
 	return m_base->RegisterStInstance(guid, obj, m_entry_id);
 }
 
-void CSingleTonEntry::Unregister(void)
-{
-	CSingleTonEntry* entry = Instance();
-	entry->m_base->UnRegisterEntry(entry->m_entry_id);
-}
