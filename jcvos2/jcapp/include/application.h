@@ -206,10 +206,7 @@ namespace jcvos
 				| CJCLogger::COL_FUNCTION_NAME
 				| CJCLogger::COL_REAL_TIME
 				);
-//#ifdef _DEBUG
 //			// 调试版本：log配置文件位于当前目录
-//			LOGGER_CONFIG(BASE::LOG_CONFIG_FN);
-//#else
 			// log配置文件置于exe文件相同目录
 			std::wstring app_path;
 			GetAppPath(app_path);

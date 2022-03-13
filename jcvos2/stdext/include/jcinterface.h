@@ -93,6 +93,11 @@ namespace jcvos
 		{
 			return static_cast<ImpClass*>(new jcvos::CDynamicInstance<ImpClass>);
 		}
+		template <typename T>
+		static ImpClass* Create(const T& p)
+		{
+			return static_cast<ImpClass*>(new jcvos::CDynamicInstance<ImpClass>(p));
+		}
 	protected:
 		mutable __declspec(align(4))	long	m_ref;
 	public:
