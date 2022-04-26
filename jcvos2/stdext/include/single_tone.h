@@ -53,7 +53,7 @@ namespace jcvos
 		static LPTHIS_TYPE Instance(void)
 		{
 			static LPTHIS_TYPE instance = NULL;
-			if (instance == NULL)
+			if (instance == nullptr)
 				CSingleTonEntry::GetInstance<CGlobalSingleTon<T> >(instance);
 			return instance;
 		}
@@ -80,7 +80,7 @@ namespace jcvos
 		static T* Instance(void)
 		{
 			static LPTHIS_TYPE instance = NULL;
-			if (instance == NULL)
+			if (instance == nullptr)
 				CSingleTonEntry::GetInstance<CGlobalSingleToneNet<T> >(instance);
 			return &(instance->m_obj);
 		}
@@ -124,11 +124,11 @@ public:
 	static void GetInstance(T * & obj)
 	{
 		CSingleTonEntry * entry = Instance();
-		JCASSERT(obj == NULL);
+		JCASSERT(obj == nullptr);
 		jcvos::CSingleTonBase * ptr = NULL;
 
 		entry->QueryStInstance(T::Guid(), ptr);
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			T* _t= new T;
 			ptr = static_cast<jcvos::CSingleTonBase *>(_t);

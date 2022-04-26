@@ -40,7 +40,7 @@ namespace jcvos
 
 		void attach(HANDLE_TYPE hdl)
 		{
-			JCASSERT(m_handle == NULL);
+			JCASSERT(m_handle == nullptr);
 			m_handle = hdl;
 		}
 
@@ -329,14 +329,14 @@ namespace jcvos
 
 		auto_cif<TYPE, BASE_TYPE> & operator = (TYPE* ptr) 
 		{
-			JCASSERT(m_ptr == NULL);
+			JCASSERT(m_ptr == nullptr);
 			m_ptr = static_cast<BASE_TYPE*>(ptr);
 			return (*this);
 		}; 
 
 		bool valid(void) {return dynamic_cast<TYPE*>(m_ptr) != NULL;};
 
-		bool operator !(void)	{ return m_ptr == NULL;}
+		bool operator !(void)	{ return m_ptr == nullptr;}
 		operator bool ()		{ return m_ptr != NULL;}
 	protected:
 		BASE_TYPE * m_ptr;

@@ -142,7 +142,7 @@ public:
 	{
 #if LOG_SINGLE_TONE_SUPPORT > 0
 		static CJCLoggerLocal* instance = NULL;
-		if (instance == NULL)	CSingleTonEntry::GetInstance<CJCLoggerLocal >(instance);
+		if (instance == nullptr)	CSingleTonEntry::GetInstance<CJCLoggerLocal >(instance);
 		return instance;
 #else
 		static CJCLoggerLocal instance;

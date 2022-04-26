@@ -140,7 +140,7 @@ bool CSingleTonContainer::RegisterEntry(CSingleTonEntry* entry, UINT &id)
 	id = 0;
 	// search for empty entry, 0 is creater, skip
 	UINT ii =1;
-	for (; ii<MAX_ENTRY; ++ii) if (m_entry_list[ii] == NULL) break;
+	for (; ii<MAX_ENTRY; ++ii) if (m_entry_list[ii] == nullptr) break;
 	id = ii;
 	m_entry_list[id] = entry;
 	m_entry_count ++;
@@ -201,7 +201,7 @@ bool CSingleTonContainer::RegisterStInstance(
 
 	do
 	{
-		if ( InterlockedCompareExchangePointer((PVOID*)( m_instance + ii), obj, NULL) == NULL)
+		if ( InterlockedCompareExchangePointer((PVOID*)( m_instance + ii), obj, NULL) == nullptr)
 		{
 			m_instance_entry[ii] = entry_id;
 			br = true;	//
@@ -228,7 +228,7 @@ bool CSingleTonContainer::QueryStInstance(const GUID & guid, jcvos::CSingleTonBa
 	EnterCriticalSection(&m_critical);
 	do
 	{
-		if ( m_instance[ii] == NULL) continue;		// 可以存在空隙。
+		if ( m_instance[ii] == nullptr) continue;		// 可以存在空隙。
 		if ( IsEqualGUID(m_instance[ii]->GetGuid(), guid) )
 		{
 			br = true;
@@ -308,10 +308,10 @@ CSingleTonEntry::CSingleTonEntry(void)
 		}
 		ptr = (LPVOID)((ULONG32)ptr + mbi.RegionSize);
 	}
-	if (m_base == NULL)
+	if (m_base == nullptr)
 	{
 		m_base = (CSingleTonContainer*)(VirtualAlloc(NULL, page_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
-		if (m_base == NULL)	_FATAL_(_T("allocate virtual page failed. error = %d\n"), GetLastError() );
+		if (m_base == nullptr)	_FATAL_(_T("allocate virtual page failed. error = %d\n"), GetLastError() );
 		_LOG_(_T("allocated new virtual page at add = 0x%08X\n"), m_base);
 		m_entry_id = 0;
 		m_base->Initialize(page_size, this);
@@ -349,7 +349,7 @@ CSingleTonEntry::CSingleTonEntry(void)
 	else
 	{
 		m_base = (CSingleTonContainer*)(VirtualAlloc(NULL, page_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
-		if (m_base == NULL)	_FATAL_(_T("allocate virtual page failed. error = %d\n"), GetLastError() );
+		if (m_base == nullptr)	_FATAL_(_T("allocate virtual page failed. error = %d\n"), GetLastError() );
 		// save it
 		_stprintf_s(str_ptr, _T("%016I64X"), (UINT64)m_base);
 		BOOL br=SetEnvironmentVariable(str_env_name, str_ptr);

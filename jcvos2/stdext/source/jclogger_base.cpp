@@ -32,7 +32,7 @@ CJCLoggerLocal::CJCLoggerLocal(CJCLoggerAppender * appender)
 	InitializeCriticalSection(&m_critical);
 #endif
 
-	if (m_appender == NULL)	m_appender = static_cast<CJCLoggerAppender*>(new jclogger::CDebugAppender(0) );
+	if (m_appender == nullptr)	m_appender = static_cast<CJCLoggerAppender*>(new jclogger::CDebugAppender(0) );
 	JCASSERT(m_appender);
 }
 
@@ -217,7 +217,7 @@ bool CJCLoggerLocal::Configurate(LPCTSTR file_name, LPCTSTR app_path)
 	bool br = false;
 
 	std::wstring path;
-	if (app_path == NULL)	path=L".\\";
+	if (app_path == nullptr)	path=L".\\";
 	else if (wcscmp(app_path, L"$APP") == 0)
 	{//	$APP开头：log file在application目录下
 	}

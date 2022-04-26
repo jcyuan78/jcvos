@@ -86,18 +86,20 @@ namespace jcvos
 	class CDynamicInstance : public ImpClass
 	{
 	public:
-		template <typename P> CDynamicInstance(P & p) : m_ref(1), ImpClass(p) {};
+		template <typename P> CDynamicInstance(const P & p) : m_ref(1), ImpClass(p) {};
 		CDynamicInstance<ImpClass>(void) : m_ref(1) {};
 		virtual ~CDynamicInstance<ImpClass>(void)	{};
 		static ImpClass * Create(void)
 		{
 			return static_cast<ImpClass*>(new jcvos::CDynamicInstance<ImpClass>);
 		}
+
 		template <typename T>
 		static ImpClass* Create(const T& p)
 		{
-			return static_cast<ImpClass*>(new jcvos::CDynamicInstance<ImpClass>(p));
+			return static_cast<ImpClass*>(new jcvos::CDynamicInstance<ImpClass>(p) );
 		}
+
 	protected:
 		mutable __declspec(align(4))	long	m_ref;
 	public:
@@ -106,7 +108,7 @@ namespace jcvos
 		virtual bool QueryInterface(const char * if_name, IJCInterface * &if_ptr) {return false;}
 		virtual bool CreateObject(IJCInterface*& obj)
 		{
-			JCASSERT(obj == NULL);
+			JCASSERT(obj == nullptr);
 			obj = static_cast<IJCInterface*>(Create());
 			return true;
 		}

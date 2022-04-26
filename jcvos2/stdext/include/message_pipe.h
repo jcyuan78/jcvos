@@ -48,7 +48,7 @@ namespace jcvos
 		static CMessagePipe* Instance(void)
 		{
 			static CMessagePipe* instance = NULL;
-			if (instance == NULL)	CSingleTonEntry::GetInstance<CMessagePipe >(instance);
+			if (instance == nullptr)	CSingleTonEntry::GetInstance<CMessagePipe >(instance);
 			return instance;
 		}
 #endif

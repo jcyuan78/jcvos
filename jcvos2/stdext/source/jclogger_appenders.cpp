@@ -23,7 +23,7 @@ FileAppender::FileAppender(LPCTSTR file_name, DWORD prop)
 
 	// 不论输出是否同步，都需要线程同步
 	LPCTSTR fn = _tcsrchr(file_name, _T('\\'));
-	if (fn == NULL) fn = file_name;
+	if (fn == nullptr) fn = file_name;
 	else			fn ++;
 	CJCStringT event_name(fn);
 	event_name += _T(".event");
