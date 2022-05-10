@@ -185,7 +185,7 @@ bool CStreamFile::ReadFromFile(void)
 // -- stream stdout
 void CreateStreamStdout(jcvos::IJCStream * & stream)
 {
-	JCASSERT(stream == NULL);
+	JCASSERT(stream == nullptr);
 	stream = static_cast<jcvos::IJCStream*>(new jcvos::CDynamicInstance<CStreamStdOut>);
 }
 

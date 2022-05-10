@@ -15,7 +15,7 @@ LOG_CLASS_SIZE(CFileMappingBuf)
 
 bool jcvos::CreateFileMappingBuf(jcvos::IFileMapping * mapping, size_t offset_sec, size_t secs, jcvos::IBinaryBuffer * & buf)
 {
-	JCASSERT(buf == NULL);
+	JCASSERT(!buf);
 	CFileMappingBuf * _buf = static_cast<CFileMappingBuf*>(
 		new jcvos::CDynamicInstance<CFileMappingBuf>);
 	bool br = _buf->ConnectToFile(mapping, offset_sec, secs);
@@ -30,7 +30,7 @@ bool jcvos::CreateFileMappingBuf(jcvos::IFileMapping * mapping, size_t offset_se
 
 bool jcvos::CreateFileMappingBufByte(jcvos::IBinaryBuffer * & buf, jcvos::IFileMapping * mapping, FILESIZE offset, FILESIZE len)
 {
-	JCASSERT(buf == NULL);
+	JCASSERT(!buf);
 	CFileMappingBuf * _buf = static_cast<CFileMappingBuf*>(
 		new jcvos::CDynamicInstance<CFileMappingBuf>);
 	bool br = _buf->ConnectToFileByte(mapping, offset, len);
@@ -66,7 +66,7 @@ template <typename T>	T AligneHi(T val, UINT64 granul)
 
 bool CFileMappingBuf::ConnectToFile(jcvos::IFileMapping * mapping, size_t offset_sec, size_t secs)
 {
-	JCASSERT(m_mapping == NULL);	JCASSERT(mapping);
+	JCASSERT(m_mapping == nullptr);	JCASSERT(mapping);
 	m_mapping = mapping;
 	m_mapping->AddRef();
 	FILESIZE start = SECTOR_TO_BYTEL(offset_sec);
@@ -81,7 +81,7 @@ bool CFileMappingBuf::ConnectToFile(jcvos::IFileMapping * mapping, size_t offset
 
 bool CFileMappingBuf::ConnectToFileByte(jcvos::IFileMapping * mapping, FILESIZE offset, FILESIZE len)
 {
-	JCASSERT(m_mapping == NULL);	JCASSERT(mapping);
+	JCASSERT(m_mapping == nullptr);	JCASSERT(mapping);
 	m_mapping = mapping;
 	m_mapping->AddRef();
 	FILESIZE start = offset;

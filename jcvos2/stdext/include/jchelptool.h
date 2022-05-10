@@ -24,6 +24,8 @@ namespace jcvos
 	bool ToFullPathName(const std::wstring & src_fn, std::wstring & full_path);
 
 	void UnicodeToUtf8(std::string & dest, const std::wstring & src);
+	void UnicodeToUtf8(std::string& dest, const wchar_t * src, size_t len);
+
 	void Utf8ToUnicode(std::wstring & dst, const std::string & src);
 
 	// Convert an integer to string in hex

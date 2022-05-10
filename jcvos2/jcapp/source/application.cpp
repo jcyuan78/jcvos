@@ -112,7 +112,7 @@ void CJCAppBase::ShowAppInfo(FILE * out)
 
 CJCAppBase * CJCAppBase::GetApp(void)
 {
-	if (m_instance == NULL)	
+	if (m_instance == nullptr)	
 	{
 #if APP_GLOBAL_SINGLE_TONE > 0
 		CSingleToneEntry * entry = CSingleToneEntry::Instance();

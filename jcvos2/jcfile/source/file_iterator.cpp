@@ -37,7 +37,7 @@ void CFileIterator::Forward(void)
 
 void CFileIterator::Duplicate(jcvos::IStreamIteratorA * & it) const
 {
-	JCASSERT(it == NULL);
+	JCASSERT(it == nullptr);
 	CFileIterator * _it = jcvos::CDynamicInstance<CFileIterator>::Create();
 	_it->m_file_mapping = m_file_mapping;	_it->m_file_mapping->AddRef();
 	//_it->m_file_size = m_file_size;
@@ -109,7 +109,7 @@ void CFileIterator::LoadBuffer(FILESIZE buf_id, size_t offset)
 
 bool jcvos::CreateFileIterator(const std::wstring & fn, jcvos::IStreamIteratorA * & it)
 {
-	JCASSERT(it == NULL);
+	JCASSERT(it == nullptr);
 	auto _it = jcvos::CDynamicInstance<CFileIterator>::Create();
 	_it->Init(fn);
 	//it = static_cast<jcvos::IStreamIteratorA*>(new CFileIterator(fn));

@@ -18,7 +18,7 @@ using namespace jcvos;
 bool jcvos::CreateAsyncInputFile(const std::wstring & fn, CAsyncInputFile *& file)
 {
 	bool br = true;
-	JCASSERT(file == NULL);
+	JCASSERT(file == nullptr);
 	try
 	{
 		//file = new CAsyncInputFile(fn);
@@ -55,7 +55,7 @@ void CAsyncInputFile::Init(const std::wstring & fn)
 		0, NULL, OPEN_EXISTING, 
 		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING
 		, NULL);
-	if (m_file == NULL || m_file == INVALID_HANDLE_VALUE) 
+	if (m_file == nullptr || m_file == INVALID_HANDLE_VALUE) 
 		THROW_WIN32_ERROR(_T("failed on opening file %s"), fn.c_str());
 	
 	// 初始化overlap结构
@@ -80,7 +80,7 @@ void CAsyncInputFile::Init(const std::wstring & fn)
 
 	// 初始化缓存队列buffer
 	m_buffer = VirtualAlloc(NULL, m_buf_size * BUFFER_NUM, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-	if (m_buffer == NULL)
+	if (m_buffer == nullptr)
 	{
 		DWORD err_id = GetLastError();
 		CloseHandle(m_file);	m_file = NULL;

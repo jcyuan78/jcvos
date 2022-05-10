@@ -72,7 +72,7 @@ VALUE_TYPE jcvos::StringToType(LPCTSTR str)
 
 void jcvos::CTypedValueBase::GetSubValue(LPCTSTR name, IValue * & val)
 {
-	JCASSERT(val == NULL);
+	JCASSERT(val == nullptr);
 	if (_tcscmp(name, _T("") ) == 0 ) val = static_cast<IValue*>(this);
 }
 

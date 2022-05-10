@@ -193,11 +193,11 @@ namespace jcvos
 			CSingleToneEntry * entry = CSingleToneEntry::Instance();
 			CSingleTonBase * ptr = NULL;
 			entry->QueryStInstance(GetGuid(), ptr);
-			JCASSERT(ptr == NULL);
+			JCASSERT(ptr == nullptr);
 			entry->RegisterStInstance(GetGuid(), static_cast<CSingleTonBase *>(this) );
 #else
 			// register app pointer to jcapp base
-			JCASSERT(CJCAppBase::m_instance == NULL);
+			JCASSERT(CJCAppBase::m_instance == nullptr);
 			CJCAppBase::m_instance = static_cast<CJCAppBase *>(this);
 #endif
 
@@ -225,7 +225,7 @@ namespace jcvos
 #if APP_GLOBAL_SINGLE_TONE > 0
 		// global single tone support
 		static CJCApp<BASE> * instance = NULL;
-		if (instance == NULL)	CSingleToneEntry::GetInstance< CJCApp<BASE> >(instance);
+		if (instance == nullptr)	CSingleToneEntry::GetInstance< CJCApp<BASE> >(instance);
 		return instance;
 #else
  		// local single tone support

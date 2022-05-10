@@ -128,6 +128,14 @@ bool jcvos::ToFullPathName(const std::wstring & src_fn, std::wstring & full_path
 }
 #endif
 
+void jcvos::UnicodeToUtf8(std::string& dest, const wchar_t* szSrc, size_t src_len)
+{
+	size_t dest_len = src_len * 3 + 1;
+	dest.resize(dest_len);
+	size_t len = UnicodeToUtf8((char*)dest.data(), dest_len, szSrc, src_len);
+	dest.resize(len);
+}
+
 
 void jcvos::UnicodeToUtf8(std::string & dest, const std::wstring & src)
 {

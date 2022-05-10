@@ -72,7 +72,7 @@ namespace jcvos
 		CSmartIterator(void) : m_it(NULL) {}
 
 	public:
-		// m_it == NULL表示EOF
+		// m_it == nullptr表示EOF
 		CSmartIterator(IStreamIterator<CharType> * it) : m_it(it)
 		{ JCASSERT(it); m_it->AddRef(); }
 		CSmartIterator(const CSmartIterator & it) : m_it(NULL) {

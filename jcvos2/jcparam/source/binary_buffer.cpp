@@ -101,7 +101,7 @@ bool jcvos::SaveBinaryToFile(jcvos::IBinaryBuffer * & buf, const std::wstring & 
 
 bool jcvos::DuplicateBuffer(jcvos::IBinaryBuffer * & dst, jcvos::IBinaryBuffer * src)
 {
-	JCASSERT(dst == NULL);
+	JCASSERT(dst == nullptr);
 	CBinaryBuffer *_buf = jcvos::CDynamicInstance<CBinaryBuffer>::Create();
 	size_t len = src->GetSize();
 	_buf->CreateBuffer(len);
@@ -174,7 +174,7 @@ protected:
 bool jcvos::CreatePartialBuffer(jcvos::IBinaryBuffer * & partial, jcvos::IBinaryBuffer * src, 
 		size_t offset, size_t secs)
 {
-	JCASSERT(partial == NULL);
+	JCASSERT(partial == nullptr);
 	CPartialBuffer * p = static_cast<CPartialBuffer*>(new jcvos::CDynamicInstance<CPartialBuffer> );
 	bool br=p->SetBuffer(src, SECTOR_TO_BYTE(offset), SECTOR_TO_BYTE(secs));
 	if (!br)
@@ -205,7 +205,7 @@ protected:
 	}
 	void CreateBuffer(size_t len)
 	{
-		JCASSERT(m_data == NULL);
+		JCASSERT(m_data == nullptr);
 		m_data=VirtualAlloc(NULL, len, MEM_COMMIT| MEM_RESERVE, PAGE_READWRITE);
 		if (!m_data) THROW_WIN32_ERROR(L"virtual memory allocation failed. len=%d", len);
 		m_len = len;

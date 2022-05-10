@@ -39,7 +39,7 @@ UINT64 CFileMapping::m_grn_mask = 0;
 
 bool jcvos::CreateFileMappingObject(jcvos::IFileMapping * & mapping, const std::wstring & fn, DWORD access, DWORD flag)
 {
-	JCASSERT(mapping == NULL);
+	JCASSERT(mapping == nullptr);
 	CFileMappingImpl * _mapping = new CFileMappingImpl();	JCASSERT(_mapping);
 	bool br = _mapping->OpenFile(fn, access, flag);
 	if (!br)
@@ -54,7 +54,7 @@ bool jcvos::CreateFileMappingObject(jcvos::IFileMapping * & mapping, const std::
 
 bool jcvos::CreateFileMappingObject(HANDLE file, FILESIZE set_size, jcvos::IFileMapping * & mapping)
 {
-	JCASSERT(mapping == NULL);
+	JCASSERT(mapping == nullptr);
 	CFileMappingImpl * _mapping = new CFileMappingImpl();	JCASSERT(_mapping);
 	bool br = _mapping->SetFile(file, set_size);
 	if (!br)

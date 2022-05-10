@@ -40,7 +40,7 @@ CStringIterator<CharType>::~CStringIterator(void)
 template <typename CharType>
 void CStringIterator<CharType>::Duplicate(IStreamIterator<CharType> * & it) const
 {
-	JCASSERT(it == NULL);
+	JCASSERT(it == nullptr);
 	CStringIterator<CharType> *_it = jcvos::CDynamicInstance< CStringIterator<CharType> >::Create();
 	_it->Init(m_buf, m_ptr);
 		//new CStringIterator<CharType>(m_buf/*, m_buf_len*/, m_ptr);
@@ -94,7 +94,7 @@ bool CStringIterator<CharType>::IsEnd(void) const
 template <>
 bool jcvos::CreateStringIterator<char>(const char * str, IStreamIterator<char> * & it)
 {
-	JCASSERT(it == NULL);
+	JCASSERT(it == nullptr);
 	//it = new CStringIterator<char>(str);
 	auto _it = CDynamicInstance<CStringIterator<char> >::Create();
 	_it->Init(str);
@@ -108,7 +108,7 @@ bool jcvos::CreateStringIterator<char>(const char * str, IStreamIterator<char> *
 template <>
 bool jcvos::CreateStringIterator<wchar_t>(const wchar_t * str, IStreamIterator<wchar_t> * & it)
 {
-	JCASSERT(it == NULL);
+	JCASSERT(it == nullptr);
 	//it = new CStringIterator<wchar_t>(str);
 	auto _it = CDynamicInstance<CStringIterator<wchar_t> >::Create();
 	_it->Init(str);
