@@ -71,6 +71,11 @@ namespace jcvos
 		return (t0.QuadPart) * ts_cycle;
 	}
 
+	inline INT64 usecsToTimeStamp(INT64 us)
+	{
+		return (INT64)(us / ts_cycle);
+	}
+
 	///<summary> 返回系统计时的周期，以us为单位 </summary>
 	inline double GetTsCycle(void)
 	{

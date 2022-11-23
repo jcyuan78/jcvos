@@ -32,6 +32,14 @@ protected:
 
 //-----------------------------------------------------------------------------
 //----  CBinaryBuffer
+
+
+
+/// <summary> 创建buffer对象 </summary>
+/// <param name="buf">[OUT] 返回的buffer对象</param>
+/// <param name="len">[IN] buffer大小，字节单位</param>
+/// <param name="reserved">[IN] 保留的buffer大小，字节单位。缺省和len一样大</param>
+/// <returns></returns>
 bool jcvos::CreateBinaryBuffer(jcvos::IBinaryBuffer * & buf, size_t len, size_t reserved)
 {
 	JCASSERT(buf==0);

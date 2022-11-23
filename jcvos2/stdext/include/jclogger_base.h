@@ -69,6 +69,7 @@ public:
 		COL_REAL_TIME =		0x08000000,
 		COL_REAL_DATE =		0x04000000,		
 		COL_SIGNATURE =		0x02000000,		// <JC>
+		COL_TAG_NAME =		0x01000000,
 	};
 
 	enum PROPERTY
@@ -79,7 +80,7 @@ public:
 public:
     typedef std::map<std::wstring, CJCLoggerNode*> LoggerCategoryMap;
     CJCLoggerLocal(CJCLoggerAppender * appender = NULL);
-    /*virtual*/ ~CJCLoggerLocal(void);
+    ~CJCLoggerLocal(void);
 
 
     bool RegisterLoggerNode(CJCLoggerNode * node);
@@ -104,6 +105,7 @@ public:
 	//  Single Tone对象指针的虚表调用，确保调用的是同一个函数实例。
     virtual CJCLoggerNode * EnableCategory(const std::wstring & name, int level);
     CJCLoggerNode * GetLogger(const std::wstring & name);
+	CJCLoggerNode* GetLoggerAdd(const std::wstring& name, int level);
 
 	static const GUID & Guid(void) {return m_guid;};
 
@@ -457,9 +459,9 @@ public:
 #endif      //LOGGER_LEVEL_RELEASEINFO
 #endif		// LOGGER_LECEL_CRETICAL
 
-#define FULL_LOG_DEBUG(name, ...)    {   \
-    CJCLoggerNode * _logger = CJCLogger::Instance()->GetLogger(name); \
-    _LOGGER_DEBUG(_logger, __VA_ARGS__)    \
+#define F_LOG_DEBUG(name, fmt, ...)    {   \
+    CJCLoggerNode * _logger = CJCLogger::Instance()->GetLoggerAdd(name, LOGGER_LEVEL_DEBUGINFO); \
+    _LOGGER_DEBUG(_logger, 0, (L"[" name L"] " fmt), __VA_ARGS__)    \
     }
 
 #define LOG_CRITICAL(...)				_LOGGER_CRITICAL(_local_logger, __VA_ARGS__);
@@ -474,7 +476,7 @@ public:
 #define LOG_NOTICE(...)					_LOGGER_NOTICE(_local_logger, __VA_ARGS__);
 #define LOG_TRACE(...)					_LOGGER_TRACE(_local_logger, __VA_ARGS__);
 #define LOG_DEBUG(...)					_LOGGER_DEBUG(_local_logger, 0, __VA_ARGS__)
-#define LOG_DEBUG_(lv, ...)					_LOGGER_DEBUG(_local_logger,lv, __VA_ARGS__)
+#define LOG_DEBUG_(lv, ...)				_LOGGER_DEBUG(_local_logger,lv, __VA_ARGS__)
 #define CLSLOG_DEBUG(classname, ...)    _LOGGER_DEBUG(_m_logger, __VA_ARGS__);
 
 //#define THROW_WIN32_ERROR

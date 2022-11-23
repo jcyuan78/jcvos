@@ -26,7 +26,7 @@ namespace jcvos
 		void reserve(size_t) {};
 		P_ITEM_TYPE & operator [] (size_t) 
 		{
-			THORW_ERROR(ERR_APP, _T("Do not support sub index.") );
+			THROW_ERROR(ERR_APP, _T("Do not support sub index.") );
 			P_ITEM_TYPE dummy = NULL;
 			return dummy;
 		}

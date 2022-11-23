@@ -48,7 +48,6 @@
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DEBUG_STATIC|x64'" Label="Configuration">
     <VcpkgConfiguration>Debug</VcpkgConfiguration>
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -56,21 +55,18 @@
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DEBUG_DYNAMIC|Win32'" Label="Configuration">
     <VcpkgConfiguration>Debug</VcpkgConfiguration>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DEBUG_DYNAMIC|x64'" Label="Configuration">
     <VcpkgConfiguration>Debug</VcpkgConfiguration>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RELEASE_STATIC|Win32'" Label="Configuration">
     <VcpkgConfiguration>Release</VcpkgConfiguration>
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -79,7 +75,6 @@
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RELEASE_STATIC|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
@@ -87,7 +82,6 @@
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RELEASE_DYNAMIC|Win32'" Label="Configuration">
     <VcpkgConfiguration>Release</VcpkgConfiguration>
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -95,7 +89,6 @@
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RELEASE_DYNAMIC|x64'" Label="Configuration">
     <VcpkgConfiguration>Release</VcpkgConfiguration>
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -103,7 +96,6 @@
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>

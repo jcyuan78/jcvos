@@ -98,6 +98,7 @@ inline void _NOTSUPPORT(LPCTSTR msg = NULL)
 		jcvos::CJCException err(__temp_str, jcvos::CJCException::level); \
 		delete [] __temp_str;						\
         LogException(__STR2WSTR__(__FUNCTION__), __LINE__, err);	\
+		jcbreak;	\
         throw err; }
 
 #define THROW_ERROR_EX(level, id, ...)   {					\
@@ -106,6 +107,7 @@ inline void _NOTSUPPORT(LPCTSTR msg = NULL)
 		jcvos::CJCException err(__temp_str, jcvos::CJCException::level, id); \
 		delete [] __temp_str;						\
         LogException(__STR2WSTR__(__FUNCTION__), __LINE__, err);	\
+		jcbreak;	\
         throw err; }
 
 #ifdef WIN32
@@ -116,6 +118,7 @@ inline void _NOTSUPPORT(LPCTSTR msg = NULL)
         jcvos::CWin32Exception err(err_id, __temp_str);				\
  		delete [] __temp_str;											\
         LogException(__STR2WSTR__(__FUNCTION__), __LINE__, err);						\
+		jcbreak;	\
         throw err;  \
     }
 
@@ -125,6 +128,7 @@ inline void _NOTSUPPORT(LPCTSTR msg = NULL)
         jcvos::CWin32Exception err(errid, __temp_str);					\
  		delete [] __temp_str;											\
         LogException(__STR2WSTR__(__FUNCTION__), __LINE__, err);					\
-        throw err;  \
+ 		jcbreak;	\
+       throw err;  \
     }
 #endif

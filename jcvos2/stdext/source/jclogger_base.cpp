@@ -59,10 +59,8 @@ CJCLoggerNode * CJCLoggerLocal::EnableCategory(const std::wstring & name, int le
 {
     LoggerCategoryMap::iterator it = m_logger_category.find(name);
     if (it == m_logger_category.end() )
-    {
-        // Create new logger
+    {    // Create new logger
         CJCLoggerNode * logger = CJCLoggerNode::CreateLoggerNode(name, level);
-//		_LOG_(_T("add logger: 0x%08X, %s, this=0x%08X\n"), (UINT32)(logger), name.c_str(), (UINT32)this )
 		_LOG_(L"add logger: 0x%p, %s, this=0x%p\n", logger, name.c_str(), this )
         std::pair<LoggerCategoryMap::iterator, bool> rc;
         rc = m_logger_category.insert(LoggerCategoryMap::value_type(name, logger) );
@@ -70,36 +68,47 @@ CJCLoggerNode * CJCLoggerLocal::EnableCategory(const std::wstring & name, int le
     }
 	else
 	{
-		//_LOG_(_T("enable logger: 0x%08X, %s, this=0x%08X\n"), 
-		//	(UINT32)(it->second), name.c_str(), (UINT32)this )
 		_LOG_(L"enable logger: 0x%p, %s, this=0x%p\n", it->second, name.c_str(), this )
 	}
     return it->second;
 }
 
-CJCLoggerNode * CJCLoggerLocal::GetLogger(const std::wstring & name/*, int level*/)
+CJCLoggerNode * CJCLoggerLocal::GetLogger(const std::wstring & name)
 {
     CJCLoggerNode * logger = NULL;
     LoggerCategoryMap::iterator it = m_logger_category.find(name);
-    if ( it != m_logger_category.end() )
-    {
-        logger = it->second;
-    }
+    if ( it != m_logger_category.end() )    {  logger = it->second;   }
     return logger;
 }
 
+CJCLoggerNode* CJCLoggerLocal::GetLoggerAdd(const std::wstring& name, int level)
+{
+	CJCLoggerNode* logger = nullptr;
+	LoggerCategoryMap::iterator it = m_logger_category.find(name);
+	if (it != m_logger_category.end()) { logger = it->second; }
+	else
+	{
+		logger = CJCLoggerNode::CreateLoggerNode(name, level);
+		_LOG_(L"add logger: 0x%p, %s, this=0x%p\n", logger, name.c_str(), this);
+		std::pair<LoggerCategoryMap::iterator, bool> rc;
+		rc = m_logger_category.insert(LoggerCategoryMap::value_type(name, logger));
+		it = rc.first;
+	}
+	return logger;
+}
 
 
 void CJCLoggerLocal::ParseColumn(LPTSTR line_buf)
 {
 	DWORD col = 0;
-	if		( 0 == _tcscmp(line_buf + 1, L"THREAD_ID") )		col = COL_THREAD_ID;
-	else if ( 0 == _tcscmp(line_buf + 1, L"TIME_STAMP") )	col = COL_TIME_STAMP;
-	else if ( 0 == _tcscmp(line_buf + 1, L"COMPNENT_NAME") )	col = COL_COMPNENT_NAME;
-	else if ( 0 == _tcscmp(line_buf + 1, L"FUNCTION_NAME") )	col = COL_FUNCTION_NAME;
-	else if ( 0 == _tcscmp(line_buf + 1, L"REAL_TIME") )		col = COL_REAL_TIME;
-	else if ( 0 == _tcscmp(line_buf + 1, L"REAL_DATE") )		col = COL_REAL_DATE;
-	else if ( 0 == _tcscmp(line_buf + 1, L"SIGNATURE") )		col = COL_SIGNATURE;
+	if (0 == _tcscmp(line_buf + 1, L"THREAD_ID"))			col = COL_THREAD_ID;
+	else if (0 == _tcscmp(line_buf + 1, L"TIME_STAMP"))		col = COL_TIME_STAMP;
+	else if (0 == _tcscmp(line_buf + 1, L"COMPNENT_NAME"))	col = COL_COMPNENT_NAME;
+	else if (0 == _tcscmp(line_buf + 1, L"FUNCTION_NAME"))	col = COL_FUNCTION_NAME;
+	else if (0 == _tcscmp(line_buf + 1, L"REAL_TIME"))		col = COL_REAL_TIME;
+	else if (0 == _tcscmp(line_buf + 1, L"REAL_DATE"))		col = COL_REAL_DATE;
+	else if (0 == _tcscmp(line_buf + 1, L"SIGNATURE"))		col = COL_SIGNATURE;
+	else if (0 == _tcscmp(line_buf + 1, L"TAG_NAME"))		col = COL_TAG_NAME;
 
 	if ('+' == line_buf[0])		m_column_select |= col;
 	else if ('-' == line_buf[0] ) m_column_select &= (~col);
@@ -273,39 +282,6 @@ void CJCLoggerLocal::WriteString(LPCTSTR str, size_t len)
 	LeaveCriticalSection(&m_critical);
 }
 
-/*
-void CJCLoggerLocal::CreateAppender(LPCTSTR app_type, LPCTSTR file_name, DWORD prop)
-{
-	// create appender
-	//CleanUp();
-	CJCLoggerAppender * temp = NULL;
-	if (_tcscmp(_T("FILE"), app_type) == 0 )
-	{
-		temp = static_cast<CJCLoggerAppender*>(new jclogger::FileAppender(file_name, prop) );
-	}
-	else if (_tcscmp(_T("DEBUG"), app_type) == 0 )
-	{
-		temp = static_cast<CJCLoggerAppender*>(new jclogger::CDebugAppender(prop) );
-	}
-	else if (_tcscmp(_T("STDERR"), app_type) == 0)
-	{
-		temp = static_cast<CJCLoggerAppender*>(new jclogger::CStdErrApd );
-	}
-	else if (_tcscmp(_T("NONE"), app_type) == 0)
-	{
-		temp = static_cast<CJCLoggerAppender*>(new jclogger::CNoneApd );
-	}
-	if (temp)
-	{
-		TCHAR msg[256];
-		size_t len = _stprintf_s(msg, _T("[APPENDER] change to %s : %s\n"), app_type, file_name?file_name:_T(""));
-		m_appender->WriteString(msg, len );
-		delete m_appender;
-		m_appender = temp;
-	}
-}
-*/
-
 void CJCLoggerLocal::RegistFunction(const CJCStringT & func, LONGLONG duration)
 {
 	typedef std::pair<CJCStringT, CJCFunctionDuration>	PAIR;
@@ -381,7 +357,7 @@ void CJCLoggerNode::LogMessageFuncV(const wchar_t * function, LPCTSTR format, va
 	if (col_sel & CJCLoggerLocal::COL_THREAD_ID)
 	{
 		DWORD tid = GetCurrentThreadId();
-		ir = jcvos::jc_sprintf(str, remain, L"<TID=%04d> ", tid);
+		ir = jcvos::jc_sprintf(str, remain, L"<TID=%04X> ", tid);
 		if (ir >=0 )  str+=ir, remain-=ir;
 	}
 
@@ -426,15 +402,15 @@ void CJCLoggerNode::LogMessageFuncV(const wchar_t * function, LPCTSTR format, va
 		ir = jcvos::jc_sprintf(str, remain, L"<COM=%s> ", m_category.c_str());
 		if (ir >=0 )  str+=ir, remain-=ir;
 	}
+	if (col_sel & CJCLoggerLocal::COL_TAG_NAME)
+	{
+		ir = jcvos::jc_sprintf(str, remain, L"[%s] ", m_category.c_str());
+		if (ir >=0 )  str+=ir, remain-=ir;
+	}
 
 	if (col_sel & CJCLoggerLocal::COL_FUNCTION_NAME)
 	{
-//#if defined(WIN32)
-//		ir = jcvos::jc_sprintf(str, remain, L"<FUN=%S> "), function);
-//#else
-//		ir = jcvos::jc_sprintf(str, remain, L"<FUN=%s> ", function);
 		ir = swprintf_s(str, remain, L"<FUN=%s> ", function);
-//#endif
 		if (ir >=0 )  str+=ir, remain-=ir;
 	}
     ir = jcvos::jc_vsprintf(str, remain, format, arg);

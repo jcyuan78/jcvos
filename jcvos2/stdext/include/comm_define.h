@@ -25,9 +25,9 @@
 // 外部索引，全部使用64位
 typedef UINT64	FILESIZE;
 
-inline UINT64 MAKEQWORD(UINT a, UINT b)
+inline UINT64 MAKEQWORD(UINT lo, UINT hi)
 {
-	return ((UINT64)(a) & 0xffffffff) | (((UINT64)b & 0xffffffff) << 32);
+	return ((UINT64)(lo) & 0xffffffff) | (((UINT64)hi & 0xffffffff) << 32);
 }
 
 #ifndef LODWORD
