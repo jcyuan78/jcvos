@@ -212,7 +212,11 @@ namespace jcvos
 			GetAppPath(app_path);
 			//(app_path += _T("\\"));
 			std::wstring file_name = /*app_path + */BASE::LOG_CONFIG_FN;
+#ifdef _DEBUG
+			LOGGER_CONFIG(file_name.c_str(), nullptr);
+#else
 			LOGGER_CONFIG(file_name.c_str(), app_path.c_str());
+#endif
 //#endif
 		}
 		virtual ~CJCApp(void) {}

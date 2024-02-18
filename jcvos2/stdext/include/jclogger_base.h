@@ -459,7 +459,7 @@ public:
 #endif      //LOGGER_LEVEL_RELEASEINFO
 #endif		// LOGGER_LECEL_CRETICAL
 
-#define F_LOG_DEBUG(name, fmt, ...)    {   \
+#define LOG_TRACK(name, fmt, ...)    {   \
     CJCLoggerNode * _logger = CJCLogger::Instance()->GetLoggerAdd(name, LOGGER_LEVEL_DEBUGINFO); \
     _LOGGER_DEBUG(_logger, 0, (L"[" name L"] " fmt), __VA_ARGS__)    \
     }
@@ -474,7 +474,7 @@ public:
 #define LOG_WIN32_ERROR_ID(id, ...)		_LOGGER_WIN32_ERROR(_local_logger, id, __VA_ARGS__)
 #define LOG_WARNING(...)				_LOGGER_WARNING(_local_logger, __VA_ARGS__);
 #define LOG_NOTICE(...)					_LOGGER_NOTICE(_local_logger, __VA_ARGS__);
-#define LOG_TRACE(...)					_LOGGER_TRACE(_local_logger, __VA_ARGS__);
+//#define LOG_TRACE(...)					_LOGGER_TRACE(_local_logger, __VA_ARGS__);
 #define LOG_DEBUG(...)					_LOGGER_DEBUG(_local_logger, 0, __VA_ARGS__)
 #define LOG_DEBUG_(lv, ...)				_LOGGER_DEBUG(_local_logger,lv, __VA_ARGS__)
 #define CLSLOG_DEBUG(classname, ...)    _LOGGER_DEBUG(_m_logger, __VA_ARGS__);

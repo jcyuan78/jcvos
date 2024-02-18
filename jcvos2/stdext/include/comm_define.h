@@ -37,6 +37,7 @@ inline UINT64 MAKEQWORD(UINT lo, UINT hi)
 
 
 #define SECTOR_SIZE				(512)
+#define SECTOR_SIZE_BIT			(9)
 #define SECTOR_TO_BYTE(sec)		( (sec) << 9 )
 #define SECTOR_TO_BYTEL(sec)	( ((FILESIZE)(sec)) << 9 )
 // 由于右移是无符号运算，对于0会溢出。修改成下面：
@@ -45,6 +46,8 @@ inline UINT64 MAKEQWORD(UINT lo, UINT hi)
 
 // 向上取整的除法,a:被除数，b:除数
 #define ROUND_UP_DIV(a, b)	((a+b-1)/b)
+// a/(2^b)以后向上取整
+#define ROUND_UP_POWER(a, b) (((a-1)>>b)+1)
 
 // 关于字符串和UNICODE的定义
 //typedef std::string			CJCStringA;
