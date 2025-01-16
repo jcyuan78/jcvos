@@ -30,6 +30,7 @@ CJCLoggerLocal::CJCLoggerLocal(CJCLoggerAppender * appender)
 	QueryPerformanceFrequency(&freq);
 	m_ts_cycle = 1000.0 * 1000.0 / (double)(freq.QuadPart);	// unit: us
 	InitializeCriticalSection(&m_critical);
+	InitializeCriticalSection(&m_performance);
 #endif
 
 	if (m_appender == nullptr)	m_appender = static_cast<CJCLoggerAppender*>(new jclogger::CDebugAppender(0) );
@@ -52,6 +53,7 @@ CJCLoggerLocal::~CJCLoggerLocal(void)
 	delete m_appender;
 #ifdef WIN32
 	DeleteCriticalSection(&m_critical);
+	DeleteCriticalSection(&m_performance);
 #endif
 }
 
@@ -285,17 +287,25 @@ void CJCLoggerLocal::WriteString(LPCTSTR str, size_t len)
 void CJCLoggerLocal::RegistFunction(const CJCStringT & func, LONGLONG duration)
 {
 	typedef std::pair<CJCStringT, CJCFunctionDuration>	PAIR;
+	EnterCriticalSection(&m_performance);
 	DURATION_MAP::iterator it = m_duration_map.find(func);
-	if ( it == m_duration_map.end() )
+	DURATION_MAP::iterator end_id = m_duration_map.end();
+	LeaveCriticalSection(&m_performance);
+
+	if ( it == end_id )
 	{
 		CJCFunctionDuration dur(func);
+		EnterCriticalSection(&m_performance);
 		std::pair<DURATION_MAP::iterator, bool> rs = m_duration_map.insert(PAIR(func, dur));
+		LeaveCriticalSection(&m_performance);
 		JCASSERT(rs.second);
 		it = rs.first;
 	}
 	CJCFunctionDuration & dur = it->second;
-	dur.m_duration += duration;
-	dur.m_calls ++;
+	InterlockedAdd64(&dur.m_duration, duration);
+	//dur.m_duration += duration;
+	InterlockedIncrement(&dur.m_calls);
+	//dur.m_calls ++;
 }
 
 void CJCLoggerLocal::OutputFunctionDuration(void)

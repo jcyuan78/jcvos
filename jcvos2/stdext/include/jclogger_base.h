@@ -82,7 +82,6 @@ public:
     CJCLoggerLocal(CJCLoggerAppender * appender = NULL);
     ~CJCLoggerLocal(void);
 
-
     bool RegisterLoggerNode(CJCLoggerNode * node);
     bool UnregisterLoggerNode(CJCLoggerNode * node);
     void WriteString(LPCTSTR str, size_t len);
@@ -121,7 +120,10 @@ protected:
 	DWORD m_prop;
 	double m_ts_cycle;
 #ifdef WIN32
+//	CRITICAL_SECTION	m_category_locker;	// 用于保护多线程无法同时操作category
+	// 考虑到性能问题，多线程不建议使用 LOG_TRACK
 	CRITICAL_SECTION	m_critical;
+	CRITICAL_SECTION	m_performance;		// 用于锁住duration map
 #endif
 
 	// 用于统计函数的执行次数和总时间。
@@ -459,6 +461,8 @@ public:
 #endif      //LOGGER_LEVEL_RELEASEINFO
 #endif		// LOGGER_LECEL_CRETICAL
 
+
+// <BUG> 在多线程使用LOG_TRACK的时候，由于竞争关系，可能同时创建多个同名的logger。同名的logger无法track会导致内存泄露。
 #define LOG_TRACK(name, fmt, ...)    {   \
     CJCLoggerNode * _logger = CJCLogger::Instance()->GetLoggerAdd(name, LOGGER_LEVEL_DEBUGINFO); \
     _LOGGER_DEBUG(_logger, 0, (L"[" name L"] " fmt), __VA_ARGS__)    \

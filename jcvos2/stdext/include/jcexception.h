@@ -19,17 +19,18 @@ namespace jcvos
 	    enum ERROR_LEVEL
 	    {
 		    ERR_OK =		0,
+			ERR_CODE_MASK = 0x0000FFFF,
 		    ERR_WARNING	=	0x01000000,
 			// 参数行错误，输入文件错误等，
 		    ERR_PARAMETER = 0x02000000,
-				// 参数行错误
-				ERR_ARGUMENT =	0x02100000,
+			// 参数行错误
+			ERR_ARGUMENT =	0x02100000,
 		    // 用户操作错误：不是由程序本引起的错误。由用户不当操作、或者不正确的输入引起的错误。
 		    //	这类错误通常是可恢复的。在记录错误时，不记录错误发生的源代码位置。
 		    ERR_USER =		0x03000000,	
 			// 应用程序执行错误，程序设计错误，错误的使用库函数等
 		    ERR_APP =		0x04000000,
-				ERR_UNSUPPORT = 0x04800000,
+			ERR_UNSUPPORT = 0x04800000,
 			ERR_DEVICE =	0x05000000,
 		    ERR_CLIENT =	0x06000000,
 		    ERR_SERVER =	0x07000000,
@@ -47,10 +48,11 @@ namespace jcvos
 		};
 
     public:
-		CJCException(LPCTSTR msg, ERROR_LEVEL level = ERR_APP, UINT id = 0);
+		CJCException(LPCTSTR msg, ERROR_LEVEL level = ERR_APP, UINT id = 0xFFFF);
         CJCException(const CJCException & exp);
 		int GetErrorID(void) { return m_err_id;}
         virtual ~CJCException(void) throw();
+		UINT GetErrorCode(void) const { return (m_err_id & ERR_CODE_MASK); }
 
     public:
     protected:
