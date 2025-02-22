@@ -240,11 +240,12 @@ private:
 class CJCStackPerformance
 {
 public:
-    CJCStackPerformance(const wchar_t * func_name);
+    CJCStackPerformance(CJCLoggerNode * log, const wchar_t * func_name);
     ~CJCStackPerformance(void);
 	double GetDeltaTime(void);	// in us
 
 private:
+    CJCLoggerNode * m_log;
 	std::wstring m_func_name;
 	LONGLONG	m_start_time;
 };
@@ -412,7 +413,7 @@ public:
 
 #undef LOG_STACK_PERFORM
 #define LOG_STACK_PERFORM(name)   \
-    CJCStackPerformance __stack_perform__(__STR2WSTR__(__FUNCTION__)name);
+    CJCStackPerformance __stack_perform__(_local_logger, __STR2WSTR__(__FUNCTION__)name);
 
 #undef LOG_STACK_TRACE_EX
 #define LOG_STACK_TRACE_EX(fmt, ...)											\

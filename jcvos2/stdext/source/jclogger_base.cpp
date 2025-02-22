@@ -286,26 +286,20 @@ void CJCLoggerLocal::WriteString(LPCTSTR str, size_t len)
 
 void CJCLoggerLocal::RegistFunction(const CJCStringT & func, LONGLONG duration)
 {
+//	wprintf_s(L"RegistFunction: func=%s, dur=%lld\n", func.c_str(), duration);
 	typedef std::pair<CJCStringT, CJCFunctionDuration>	PAIR;
 	EnterCriticalSection(&m_performance);
 	DURATION_MAP::iterator it = m_duration_map.find(func);
-	DURATION_MAP::iterator end_id = m_duration_map.end();
-	LeaveCriticalSection(&m_performance);
-
-	if ( it == end_id )
-	{
+	if (it == m_duration_map.end()) {
 		CJCFunctionDuration dur(func);
-		EnterCriticalSection(&m_performance);
 		std::pair<DURATION_MAP::iterator, bool> rs = m_duration_map.insert(PAIR(func, dur));
-		LeaveCriticalSection(&m_performance);
-		JCASSERT(rs.second);
+//		wprintf_s(L"insert duration, func=%s, result=%d\n", func.c_str(), rs.second);
 		it = rs.first;
 	}
+	LeaveCriticalSection(&m_performance);
 	CJCFunctionDuration & dur = it->second;
 	InterlockedAdd64(&dur.m_duration, duration);
-	//dur.m_duration += duration;
 	InterlockedIncrement(&dur.m_calls);
-	//dur.m_calls ++;
 }
 
 void CJCLoggerLocal::OutputFunctionDuration(void)
@@ -493,10 +487,12 @@ double CJCStackTrace::GetRuntime(void) {
 ///////////////////////////////////////////////////////////////////////////////
 // -- StackPerformance
 // 用于计算特定函数被执行的总次数和总时间
-CJCStackPerformance::CJCStackPerformance(LPCTSTR func_name)
-	: m_func_name(func_name)
+CJCStackPerformance::CJCStackPerformance(CJCLoggerNode * log, const wchar_t * func_name)
+	: m_func_name(func_name), m_log(log)
 {
 	// 计算函数执行时间
+	log->LogMessageFunc(func_name, L"[TRACE IN]");
+
 	LARGE_INTEGER now;
 	QueryPerformanceCounter(&now);
 	m_start_time = now.QuadPart;
@@ -506,12 +502,14 @@ CJCStackPerformance::~CJCStackPerformance(void)
 {
 	LARGE_INTEGER now;
 	QueryPerformanceCounter(&now);
+
 	if (now.QuadPart < m_start_time)	
 	{
 		OutputDebugString(L"time stamp overflow\n");
 		m_start_time = (_I64_MAX - m_start_time) + now.QuadPart;
 	}
 	else m_start_time = now.QuadPart - m_start_time;
+	m_log->LogMessageFunc(m_func_name.c_str(), L"[TRACE OUT], duration = %.1f us", (double)(m_start_time*ts_cycle) );
 
 	if ( !m_func_name.empty() )	CJCLogger::Instance()->RegistFunction(m_func_name, m_start_time);
 }
