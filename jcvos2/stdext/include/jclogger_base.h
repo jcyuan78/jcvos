@@ -108,8 +108,8 @@ public:
 
 	static const GUID & Guid(void) {return m_guid;};
 
-protected:
 	void ParseAppender(LPTSTR line, const std::wstring & app_path);
+protected:
 	void ParseNode(LPTSTR line);
 	void ParseColumn(LPTSTR line);
 
